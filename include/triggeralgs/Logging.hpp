@@ -8,14 +8,12 @@
 #ifndef TRIGGERALGS_INCLUDE_LOGGING_HPP_
 #define TRIGGERALGS_INCLUDE_LOGGING_HPP_
 
-namespace dunedaq {
 namespace triggeralgs {
-namespace logging {
 
 /**
 * @brief Common name used by TRACE TLOG calls from this package
 */
-enum
+enum Logging
 {
   TLVL_VERY_IMPORTANT = 1,
   TLVL_IMPORTANT      = 2,
@@ -27,8 +25,6 @@ enum
   TLVL_DEBUG_ALL      = 20
 };
 
-} // namespace logging
 } // namespace triggeralgs
-} // namespace dunedaq
 
 #endif // TRIGGERALGS_INCLUDE_LOGGING_HPP_

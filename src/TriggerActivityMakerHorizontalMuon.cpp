@@ -7,16 +7,15 @@
  */
 
 #include "triggeralgs/HorizontalMuon/TriggerActivityMakerHorizontalMuon.hpp"
-#include "triggeralgs/Logging.hpp"
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerActivityMakerHorizontalMuonPlugin"
 #include <vector>
 #include <math.h>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_ALL;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_MEDIUM;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_ALL;
+using Logging::TLVL_DEBUG_MEDIUM;
 
 void
 TriggerActivityMakerHorizontalMuon::operator()(const TriggerPrimitive& input_tp,

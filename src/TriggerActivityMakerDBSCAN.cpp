@@ -7,7 +7,6 @@
  */
 
 #include "triggeralgs/dbscan/TriggerActivityMakerDBSCAN.hpp"
-#include "triggeralgs/Logging.hpp"
 #include "dbscan/Point.hpp"
 
 #include "TRACE/trace.h"
@@ -18,9 +17,9 @@
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_LOW;
 
 void
 TriggerActivityMakerDBSCAN::operator()(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)

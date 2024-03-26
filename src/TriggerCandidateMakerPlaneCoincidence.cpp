@@ -7,19 +7,18 @@
  */
 
 #include "triggeralgs/PlaneCoincidence/TriggerCandidateMakerPlaneCoincidence.hpp"
-#include "triggeralgs/Logging.hpp"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerCandidateMakerPlaneCoincidencePlugin"
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_HIGH;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_MEDIUM;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_INFO;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_HIGH;
+using Logging::TLVL_DEBUG_MEDIUM;
+using Logging::TLVL_DEBUG_LOW;
+using Logging::TLVL_DEBUG_INFO;
 
 void
 TriggerCandidateMakerPlaneCoincidence::operator()(const TriggerActivity& activity,

@@ -7,17 +7,16 @@
  */
 
 #include "triggeralgs/Prescale/TriggerCandidateMakerPrescale.hpp"
-#include "triggeralgs/Logging.hpp"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerCandidateMakerPrescalePlugin"
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-using dunedaq::triggeralgs::logging::TLVL_IMPORTANT;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_LOW;
+using Logging::TLVL_IMPORTANT;
 
 void
 TriggerCandidateMakerPrescale::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)

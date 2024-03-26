@@ -9,6 +9,7 @@
 #ifndef TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGERCANDIDATEMAKER_HPP_
 #define TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGERCANDIDATEMAKER_HPP_
 
+#include "triggeralgs/Logging.hpp"
 #include "triggeralgs/TriggerActivity.hpp"
 #include "triggeralgs/TriggerCandidate.hpp"
 #include "triggeralgs/Types.hpp"

@@ -7,15 +7,14 @@
  */
 
 #include "triggeralgs/MichelElectron/TriggerActivityMakerMichelElectron.hpp"
-#include "triggeralgs/Logging.hpp"
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerActivityMakerMichelElectronPlugin"
 #include <vector>
 #include <algorithm>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_MEDIUM;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_MEDIUM;
 
 void
 TriggerActivityMakerMichelElectron::operator()(const TriggerPrimitive& input_tp,

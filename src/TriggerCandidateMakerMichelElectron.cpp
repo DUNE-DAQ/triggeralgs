@@ -7,19 +7,18 @@
  */
 
 #include "triggeralgs/MichelElectron/TriggerCandidateMakerMichelElectron.hpp"
-#include "triggeralgs/Logging.hpp"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerCandidateMakerMichelElectronPlugin"
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_ALL;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_HIGH;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_INFO;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_ALL;
+using Logging::TLVL_DEBUG_HIGH;
+using Logging::TLVL_DEBUG_LOW;
+using Logging::TLVL_DEBUG_INFO;
 
 void
 TriggerCandidateMakerMichelElectron::operator()(const TriggerActivity& activity,

@@ -7,16 +7,15 @@
  */
 
 #include "triggeralgs/ADCSimpleWindow/TriggerCandidateMakerADCSimpleWindow.hpp"
-#include "triggeralgs/Logging.hpp"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerCandidateMakerADCSimpleWindowPlugin"
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-
 using namespace triggeralgs;
+
+using Logging::TLVL_DEBUG_LOW;
 
 void
 TriggerCandidateMakerADCSimpleWindow::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)

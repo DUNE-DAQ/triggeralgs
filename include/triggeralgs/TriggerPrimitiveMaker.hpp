@@ -9,6 +9,7 @@
 #ifndef TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGERPRIMITIVEMAKER_HPP_
 #define TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGERPRIMITIVEMAKER_HPP_
 
+#include "triggeralgs/Logging.hpp"
 #include "trgdataformats/TriggerPrimitive.hpp"
 
 #include <nlohmann/json.hpp>

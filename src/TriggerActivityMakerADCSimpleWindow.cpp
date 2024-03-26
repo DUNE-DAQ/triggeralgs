@@ -7,19 +7,18 @@
  */
 
 #include "triggeralgs/ADCSimpleWindow/TriggerActivityMakerADCSimpleWindow.hpp"
-#include "triggeralgs/Logging.hpp"
 
 #include "TRACE/trace.h"
 #define TRACE_NAME "TriggerActivityMakerADCSimpleWindowPlugin"
 
 #include <vector>
 
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_ALL;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_HIGH;
-using dunedaq::triggeralgs::logging::TLVL_DEBUG_LOW;
-using dunedaq::triggeralgs::logging::TLVL_IMPORTANT;
 
 using namespace triggeralgs;
+using Logging::TLVL_DEBUG_ALL;
+using Logging::TLVL_DEBUG_HIGH;
+using Logging::TLVL_DEBUG_LOW;
+using Logging::TLVL_IMPORTANT;
 
 void
 TriggerActivityMakerADCSimpleWindow::operator()(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)

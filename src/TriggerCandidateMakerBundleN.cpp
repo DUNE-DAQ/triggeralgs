@@ -13,6 +13,9 @@
 
 namespace triggeralgs {
 
+using Logging::TLVL_IMPORTANT;
+using Logging::TLVL_DEBUG_HIGH;
+
 void TriggerCandidateMakerBundleN::set_tc_attributes() {
     // Using the first TA as reference.
     dunedaq::trgdataformats::TriggerActivityData front_ta = m_current_tc.inputs.front();
@@ -37,6 +40,7 @@ TriggerCandidateMakerBundleN::operator()(const TriggerActivity& input_ta, std::v
   m_current_tc.inputs.push_back(input_ta);
 
   if (bundle_condition()) {
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TCBN] Emitting BundleN TriggerCandidate with " << m_current_tc.inputs.size() << " TAs.";
     set_tc_attributes();
     output_tcs.push_back(m_current_tc);
 
@@ -46,7 +50,7 @@ TriggerCandidateMakerBundleN::operator()(const TriggerActivity& input_ta, std::v
 
   // Should never reach this step. In this case, send it out.
   if (m_current_tc.inputs.size() > m_bundle_size) {
-    TLOG(TLVL_DEBUG_1) << "Emitting large BundleN TriggerCandidate with " << m_current_tc.inputs.size() << " TAs.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TCBN] Emitting large BundleN TriggerCandidate with " << m_current_tc.inputs.size() << " TAs.";
     set_tc_attributes();
     output_tcs.push_back(m_current_tc);
 

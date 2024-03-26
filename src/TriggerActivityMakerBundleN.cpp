@@ -13,6 +13,9 @@
 
 namespace triggeralgs {
 
+using Logging::TLVL_IMPORTANT;
+using Logging::TLVL_DEBUG_HIGH;
+
 void TriggerActivityMakerBundleN::set_ta_attributes() {
     // Using the first TA as reference.
     TriggerPrimitive first_tp = m_current_ta.inputs.front();
@@ -52,6 +55,7 @@ TriggerActivityMakerBundleN::operator()(const TriggerPrimitive& input_tp, std::v
   m_current_ta.inputs.push_back(input_tp);
 
   if (bundle_condition()) {
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TABN] Emitting BundleN TA with " << m_current_ta.inputs.size() << " TPs.";
     set_ta_attributes();
     output_tas.push_back(m_current_ta);
 
@@ -61,7 +65,7 @@ TriggerActivityMakerBundleN::operator()(const TriggerPrimitive& input_tp, std::v
 
   // Should never reach this step. In this case, send it out.
   if (m_current_ta.inputs.size() > m_bundle_size) {
-    TLOG(TLVL_DEBUG_1) << "Emitting large BundleN TriggerActivity with " << m_current_ta.inputs.size() << " TPs.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TABN] Emitting large BundleN TriggerActivity with " << m_current_ta.inputs.size() << " TPs.";
     set_ta_attributes();
     output_tas.push_back(m_current_ta);
 
