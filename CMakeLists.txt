@@ -55,6 +55,8 @@ add_library(triggeralgs SHARED
   src/TriggerCandidateMakerDBSCAN.cpp
   src/TriggerActivityMakerChannelAdjacency.cpp
   src/TriggerCandidateMakerChannelAdjacency.cpp
+  src/TriggerActivityMakerChannelTimeAdjacency.cpp
+  src/TriggerCandidateMakerChannelTimeAdjacency.cpp
   src/TAWindow.cpp
   src/TPWindow.cpp
   src/dbscan/dbscan.cpp
