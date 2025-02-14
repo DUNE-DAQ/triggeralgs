@@ -28,4 +28,10 @@ ERS_DECLARE_ISSUE(triggeralgs,
                   "Bad configuration in " << alg_name,
                   ((std::string)alg_name))
 
+ERS_DECLARE_ISSUE(triggeralgs,
+                  InvalidConfiguration,
+                  "Invalid configuration error: " << conferror,
+                  ((std::string)conferror))
+
+
 #endif // TRIGGERALGS_INCLUDE_TRIGGERALGS_ISSUES_HPP_

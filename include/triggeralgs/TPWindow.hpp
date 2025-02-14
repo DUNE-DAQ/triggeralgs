@@ -34,8 +34,8 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const TPWindow& window);
 
-  timestamp_t time_start;
-  uint32_t adc_integral;
+  timestamp_t time_start = 0;
+  uint32_t adc_integral = 0;
   std::unordered_map<channel_t, uint16_t> channel_states;
   std::vector<TriggerPrimitive> inputs;
 };

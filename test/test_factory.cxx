@@ -23,7 +23,7 @@ namespace triggeralgs {
 
 BOOST_AUTO_TEST_CASE(test_macro_overview)
 {
-  std::unique_ptr<TriggerActivityMaker> prescale_maker = TriggerActivityFactory::makeTAMaker("TriggerActivityMakerPrescalePlugin");
+  std::unique_ptr<TriggerActivityMaker> prescale_maker = TriggerActivityFactory::makeTAMaker("TAMakerPrescaleAlgorithm");
 
   std::vector<TriggerActivity> prescale_ta;
   TriggerPrimitive some_tp;

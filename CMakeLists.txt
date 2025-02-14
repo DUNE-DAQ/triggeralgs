@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(triggeralgs VERSION 1.3.2)
+project(triggeralgs VERSION 1.4.0)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -60,6 +60,27 @@ add_library(triggeralgs SHARED
   src/TriggerActivityMakerChannelAdjacency.cpp
   src/TriggerCandidateMakerChannelAdjacency.cpp
   src/TriggerActivityMakerTriton.cpp
+  src/TAMakerADCSimpleWindowAlgorithm.cpp
+  src/TCMakerADCSimpleWindowAlgorithm.cpp
+  src/TAMakerHorizontalMuonAlgorithm.cpp
+  src/TCMakerHorizontalMuonAlgorithm.cpp
+  src/TCMakerPlaneCoincidenceAlgorithm.cpp
+  src/TAMakerPlaneCoincidenceAlgorithm.cpp
+  src/TAMakerMichelElectronAlgorithm.cpp
+  src/TCMakerMichelElectronAlgorithm.cpp
+  src/TAMakerPrescaleAlgorithm.cpp
+  src/TCMakerPrescaleAlgorithm.cpp
+  src/TAMakerSupernovaAlgorithm.cpp
+  src/TCMakerSupernovaAlgorithm.cpp
+  src/TDMakerSupernovaAlgorithm.cpp
+  src/TAMakerDBSCANAlgorithm.cpp
+  src/TCMakerDBSCANAlgorithm.cpp
+  src/TAMakerChannelDistanceAlgorithm.cpp
+  src/TCMakerChannelDistanceAlgorithm.cpp
+  src/TAMakerBundleNAlgorithm.cpp
+  src/TCMakerBundleNAlgorithm.cpp
+  src/TAMakerChannelAdjacencyAlgorithm.cpp
+  src/TCMakerChannelAdjacencyAlgorithm.cpp
   src/TAWindow.cpp
   src/TPWindow.cpp
   src/dbscan/dbscan.cpp
