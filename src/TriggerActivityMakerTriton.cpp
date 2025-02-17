@@ -9,10 +9,10 @@
 #include "triggeralgs/Triton/TriggerActivityMakerTriton.hpp"
 
 #include "TRACE/trace.h"
+#define TRACE_NAME "TriggerActivityMakerTriton"
 //#include "grpc_client.h"
 //#include "triggeralgs/Triton/json_utils.h"
 //#include "rapidjson/document.h"
-#define TRACE_NAME "TriggerActivityMakerTritonPlugin"
 
 namespace tc = triton::client;
 
@@ -26,7 +26,7 @@ using Logging::TLVL_DEBUG_ALL;
 static std::unique_ptr<triton::client::InferenceServerGrpcClient> client;
 
 void
-TriggerActivityMakerTriton::operator()(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_tas)
+TriggerActivityMakerTriton::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_tas)
 {
   // Expect that TPs are inherently time ordered.
   m_current_ta.inputs.push_back(input_tp);

@@ -38,27 +38,6 @@ find_package(gRPC REQUIRED)
 # which uses triggeralgs (eg, for dunedaq plugins, the plugin will be
 # provided by the trigger package)
 add_library(triggeralgs SHARED
-  src/TriggerActivityMakerADCSimpleWindow.cpp
-  src/TriggerActivityMakerChannelDistance.cpp
-  src/TriggerCandidateMakerChannelDistance.cpp
-  src/TriggerCandidateMakerADCSimpleWindow.cpp
-  src/TriggerActivityMakerBundleN.cpp
-  src/TriggerCandidateMakerBundleN.cpp
-  src/TriggerActivityMakerHorizontalMuon.cpp
-  src/TriggerCandidateMakerHorizontalMuon.cpp
-  src/TriggerCandidateMakerPlaneCoincidence.cpp
-  src/TriggerActivityMakerPlaneCoincidence.cpp
-  src/TriggerActivityMakerMichelElectron.cpp
-  src/TriggerCandidateMakerMichelElectron.cpp
-  src/TriggerActivityMakerPrescale.cpp
-  src/TriggerCandidateMakerPrescale.cpp
-  src/TriggerActivityMakerSupernova.cpp
-  src/TriggerCandidateMakerSupernova.cpp
-  src/TriggerDecisionMakerSupernova.cpp
-  src/TriggerActivityMakerDBSCAN.cpp
-  src/TriggerCandidateMakerDBSCAN.cpp
-  src/TriggerActivityMakerChannelAdjacency.cpp
-  src/TriggerCandidateMakerChannelAdjacency.cpp
   src/TriggerActivityMakerTriton.cpp
   src/TAMakerADCSimpleWindowAlgorithm.cpp
   src/TCMakerADCSimpleWindowAlgorithm.cpp
