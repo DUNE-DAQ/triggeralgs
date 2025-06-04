@@ -44,7 +44,7 @@ private:
   TPWindow m_induction2_window; // Y
 
   // Configurable parameters.
-  std::string m_channel_map_name = "VDColdboxChannelMap";  // Default is coldbox
+  std::string m_channel_map_name = "VDColdboxTPCChannelMap";  // Default is coldbox
   uint16_t m_adjacency_threshold = 15;   // Default is 15 wire track for testing
   int m_max_adjacency = 0;               // The maximum adjacency seen so far in any window
   uint32_t m_sot_threshold = 2000;       // Work out good values for this
@@ -56,7 +56,7 @@ private:
   timestamp_t m_window_length = 3000;    // Shouldn't exceed the max drift
 
   // Channel map object, for separating TPs by the plane view they come from
-  std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap = dunedaq::detchannelmaps::make_map(m_channel_map_name);
+  std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap = dunedaq::detchannelmaps::make_tpc_map(m_channel_map_name);
 
   // For debugging and performance study purposes.
   void add_window_to_record(TPWindow window);
