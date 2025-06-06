@@ -53,6 +53,28 @@ void WindowBin::reset(TriggerPrimitive const &input_tp){
   tp_list.push_back(input_tp);
 }
 
+void WindowBin::reset(TriggerPrimitive const &input_tp, timestamp_t const &bin_time_start){
+  // Empty the TP list.
+  tp_list.clear();
+  // Set the start time of the window to be the start time of the 
+  // the next bin.
+  time_start = bin_time_start;
+  // Start the total ADC integral.
+  adc_integral = input_tp.adc_integral;
+  // Add the input TP to the TP list.
+  tp_list.push_back(input_tp);
+}
+
+void WindowBin::initbinempty(timestamp_t const &bin_time_start){
+  // Empty the TP list.
+  tp_list.clear();
+  // Set the start time of the window to be the start time of the 
+  // input_tp.
+  time_start = bin_time_start;
+  // Start the total ADC integral.
+  adc_integral = 0;
+}
+
 std::ostream& operator<<(std::ostream& os, const WindowBin& window){
   if(window.is_empty()) os << "Bin is empty!\n";
   else{

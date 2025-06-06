@@ -30,25 +30,54 @@ void TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::v
     m_primitive_count++;
     return;
   }
+  
+  auto tp_binstart_diff = input_tp.time_start - m_current_bin.time_start;
 
+  //std::cout << "input time - bin start diff = " << tp_binstart_diff << " compared to bin length : " << m_bin_length << "\n";
   // If the difference between the current TP's start time and the start of the bin
   // is less than the specified bin width, add the TP to the bin.
-  if((input_tp.time_start - m_current_bin.time_start) < m_bin_length){
+  //if ((input_tp.time_start - m_current_bin.time_start) < m_bin_length){
+  if (tp_binstart_diff < m_bin_length){
     TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Bin not yet complete, adding the input_tp to the bin.";
     //std::cout << "[TAM:ADCSW] Bin not yet complete, adding the input_tp to the bin.\n";
     //std::cout << "TP time : " << input_tp.time_start << ", TP ADC : " << input_tp.adc_integral << "\n";
-    auto difference = input_tp.time_start - m_current_bin.time_start;
+    //auto difference = input_tp.time_start - m_current_bin.time_start;
     //std::cout << "bin length is " << m_bin_length << ", but difference is " << difference << "\n";
     m_current_bin.add(input_tp);
-  } 
+  }
   // If the window bins have not been all filled yet, add another bin
   else if (m_current_window.bincount() < nbins) {
     TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Window not yet complete, adding bin to the window.";
     //std::cout << "[TAM:ADCSW] Window not yet complete, adding bin to the window.\n";
-    m_current_window.addbin(m_current_bin);
+    //m_current_window.addbin(m_current_bin);
     // Bin added - remember to reset the bin to start again
-    m_current_bin.reset(input_tp);
+    // Check whether next TP falls within next bin or whether empty bins need to be added first
+    // Calculate how many empty bins need to be added at once
+    int bins_to_add = static_cast<int>(tp_binstart_diff / m_bin_length) - 1;
+    int bin_count = 0;
+    while (bin_count < bins_to_add && m_current_window.bincount() < nbins) {
+      ++bin_count;
+      //std::cout << "Adding empty bin " << bin_count << " at start time " << m_current_bin.time_start + bin_count * m_bin_length << "\n";
+      m_current_bin.initbinempty(m_current_bin.time_start + bin_count * m_bin_length);
+      m_current_window.addbin(m_current_bin);
+    }
+
+    m_current_window.addbin(m_current_bin);
+
+    // After adding any required empty bins, reset the current bin to the next expected bin in time.
+    if (m_current_window.bincount() < nbins) {
+      // The next bin should start immediately after the last added empty bin.
+      auto next_bin_start = m_current_bin.time_start + (bin_count + 1) * m_bin_length;
+      //std::cout << "Resetting bin " << bin_count << " at start time " << next_bin_start << "\n";
+      m_current_bin.reset(input_tp, next_bin_start);
+    } else if (m_current_window.bincount() == nbins) {
+      // If the window is already full, reset the bin based on the new input_tp's time.
+      m_current_bin.reset(input_tp);
+      // Optionally, you could also reset the window here if you want to start fresh.
+      // m_current_window.resetwindow(m_current_bin);
+    }
   }
+
   // If the addition of the current TP to the window would make it longer
   // than the specified window length, don't add it but check whether the sum of all adc in
   // the existing window is above the specified threshold. If it is, make a TA and start 
@@ -56,13 +85,16 @@ void TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::v
   // This logic will be replaced with AE calculation
   else if (m_algtype == 0 && m_current_window.sumadc() > m_adc_threshold){
     TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] ADC integral in window is greater than specified threshold.";
-    std::cout << "[TAM:ADCSW] ADC integral in window is greater than specified threshold." << std::endl;
+    //std::cout << "[TAM:ADCSW] ADC integral in window is greater than specified threshold." << std::endl;
     output_ta.push_back(construct_ta());
     TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Resetting window with input_tp.";
-    std::cout << "[TAM:ADCSW] Resetting window with input_tp." << std::endl;
+    //std::cout << "[TAM:ADCSW] Resetting window with input_tp." << std::endl;
+    // Bin reset here based on just input TP start time okay
+    // >> we are also resetting the window, so fresh window where
+    // >> first bin start is the start time first TP input
     m_current_bin.reset(input_tp);
     m_current_window.resetwindow(m_current_bin);
-    std::cout << "Constructed TA with AE Window alg!" << std::endl;
+    //std::cout << "Constructed TA with AE Window alg!" << std::endl;
   }
 
   else if (m_algtype == 1 && nbatch_iterator < nbatch) {
@@ -73,12 +105,36 @@ void TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::v
     }
     //std::cout << "\n";
     //std::cout << m_current_bin << "\n";
-    m_current_window.movebin(m_current_bin); 
+    m_current_window.movebin(m_current_bin, m_window_length); 
+    // Only moving the window along here
+    // >> Need to make sure the next bin maintaining binning structure
+    /*
+    int bins_to_add = static_cast<int>(tp_binstart_diff / m_bin_length) - 1;
+    int bin_count = 0;
+    while (bin_count < bins_to_add && m_current_window.bincount() < nbins) {
+      ++bin_count;
+      //std::cout << "Adding empty bin " << bin_count << " at start time " << m_current_bin.time_start + bin_count * m_bin_length << "\n";
+      m_current_bin.initbinempty(m_current_bin.time_start + bin_count * m_bin_length);
+      m_current_window.addbin(m_current_bin);
+    }
+    
+    if (m_current_window.bincount() < nbins) {
+      //std::cout << "Resetting bin " << bin_count << " at start time " << m_current_bin.time_start + (bin_count + 1) * m_bin_length << "\n";
+      auto next_bin_start = m_current_bin.time_start + (bin_count + 1) * m_bin_length;
+      m_current_bin.reset(input_tp, next_bin_start);
+    } else if (m_current_window.bincount() == nbins) {
+      m_current_bin.reset(input_tp);
+    }
+    */
+    //m_current_bin.reset(input_tp, m_current_bin.time_start + (bin_count + 1) * m_bin_length);
     m_current_bin.reset(input_tp);
     nbatch_iterator++;
   } 
   else if (m_algtype == 1 && nbatch_iterator == nbatch && compute_treelite_classification()) {
     output_ta.push_back(construct_ta());
+    // Bin reset here based on just input TP start time okay
+    // >> we are also resetting the window, so fresh window where
+    // >> first bin start is the start time first TP input
     m_current_bin.reset(input_tp);
     m_current_window.resetwindow(m_current_bin);
     nbatch_iterator = 0;
@@ -87,7 +143,26 @@ void TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::v
   // If it is not, move the window along by removing the front bin and adding a new one to the back
   else {
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:ADCSW] Window is at required length but threshold not met, shifting window along by 1 window bin.";
-    m_current_window.movebin(m_current_bin);
+    m_current_window.movebin(m_current_bin, m_window_length);
+    // Only moving the window along here
+    // >> Need to make sure the next bin maintaining binning structure
+    /*
+    int bin_count(0);
+    while ((input_tp.time_start - m_current_bin.time_start) > (bin_count + 2) * m_bin_length && m_current_window.bincount() < nbins) {
+      bin_count++;
+      std::cout << "Moved now adding empty bin " << bin_count << " at start time " << m_current_bin.time_start + bin_count * m_bin_length << "\n";
+      m_current_bin.initbinempty(m_current_bin.time_start + bin_count * m_bin_length);
+      m_current_window.addbin(m_current_bin);
+    }
+    std::cout << "Moved now reset bin " << bin_count << " at start time " << m_current_bin.time_start + bin_count+1 * m_bin_length << "\n";
+    if (m_current_window.bincount() < nbins) {
+      //std::cout << "Resetting bin " << bin_count << " at start time " << m_current_bin.time_start + bin_count+1 * m_bin_length << "\n";
+      m_current_bin.reset(input_tp, m_current_bin.time_start + (bin_count + 1) * m_bin_length);
+    } else if (m_current_window.bincount() == nbins) {
+      m_current_bin.reset(input_tp);
+    }
+    */
+    //m_current_bin.reset(input_tp, m_current_bin.time_start + (bin_count + 1) * m_bin_length);
     m_current_bin.reset(input_tp);
     nbatch_iterator = 0;
   }
@@ -175,13 +250,14 @@ TAMakerBSMWindowAlgorithm::construct_ta() const
 
 bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
 
-  /*
+  std::cout << "Window width = " << m_current_window.get_window_width() 
+  << ", and number of bins = " << m_current_window.bincount() << std::endl;
   std::cout << "Input: ";
   for (const auto &in : flat_batched_inputs) {
     std::cout << in << ", ";
   }
   std::cout << "\n";
-*/
+
   float result[m_treelite_model_interface->GetShapeElement(0)];
 
   m_treelite_model_interface->Predict(flat_batched_inputs.data(), result);

@@ -18,9 +18,18 @@ public:
 
   void movebin(WindowBin const &input_bin);
 
+  void movebin(WindowBin const &input_bin, timestamp_t const& window_length);
+
   float sumadc() const;
 
   int bincount() const;
+
+  timestamp_t get_window_width() const {
+    if (tp_window_bins.empty()) {
+      return 0;
+    }
+    return tp_window_bins.back().time_start - tp_window_bins.front().time_start;
+  }
 
   std::vector<std::vector<TriggerPrimitive>> getTPbins() const;
 

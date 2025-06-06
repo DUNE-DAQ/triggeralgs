@@ -66,7 +66,7 @@ void TreeliteModelInterface::Predict(float *input, float *result) {
 
 bool TreeliteModelInterface::Classify(const float *result, float &bdt_threshold) {
   for (uint64_t i = 0; i < treelite_out_shape[0]; i++) {
-    //std::cout << "BDT output = " << result[i] << "\n";
+    std::cout << "BDT output = " << result[i] << "\n";
     if (result[i] > bdt_threshold) {
       return true;
     }

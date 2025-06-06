@@ -25,6 +25,10 @@ public:
   void move(TriggerPrimitive const &input_tp, timestamp_t const &window_length);
       
   void reset(TriggerPrimitive const &input_tp);
+  // Overload to allow bin reset using time of next bin
+  void reset(TriggerPrimitive const &input_tp, timestamp_t const &bin_time_start);
+  // Initialise empty bins
+  void initbinempty(timestamp_t const &bin_time_start);
       
   friend std::ostream& operator<<(std::ostream& os, const WindowBin& window);
 
