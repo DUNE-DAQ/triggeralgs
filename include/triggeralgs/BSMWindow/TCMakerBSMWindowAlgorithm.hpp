@@ -29,7 +29,6 @@ private:
   uint64_t m_activity_count = 0; // NOLINT(build/unsigned)
 
   /// @brief Configurable TC type to produce by this TC algorithm
-  //TriggerCandidate::Type m_tc_type = TriggerCandidate::Type::kAEAnomalyWindow;
   TriggerCandidate::Type m_tc_type = TriggerCandidate::Type::kUnknown;
 };
 

@@ -13,7 +13,10 @@
 #include "triggeralgs/Types.hpp"
 #include "triggeralgs/BSMWindow/WindowBin.hpp"
 #include "triggeralgs/BSMWindow/BinnedWindow.hpp"
+#include "triggeralgs/BSMWindow/BSMWindow.hpp"
 #include "triggeralgs/BSMWindow/TreeliteModelInterface.hpp"
+#include "triggeralgs/BSMWindow/CompiledModelInterface.hpp"
+#include "triggeralgs/BSMWindow/models/treelite_compmodel_classifier_xgboost/treelitemodel.h"
 
 #include <fstream>
 #include <vector>
@@ -43,8 +46,9 @@ private:
 
   TriggerActivity construct_ta() const;
 
-  BinnedWindow m_current_window;
-  WindowBin m_current_bin;
+  BSMWindow m_current_window;
+
+  timestamp_t m_last_pred_time;
   uint64_t m_primitive_count = 0;
 
   // Try batching the input - introduce some latency,
@@ -52,6 +56,8 @@ private:
   int nbatch = 1;
   // BDT batching takes a row-major flat array
   std::vector<float> flat_batched_inputs;
+  // row-major input for Entry objects used for compiled model
+  std::vector<Entry> flat_batched_Entries;
   // Keep track of the number of windows in the current batch
   int nbatch_iterator = 0;
 
@@ -66,6 +72,8 @@ private:
 
   // Treelite model
   std::unique_ptr<TreeliteModelInterface> m_treelite_model_interface;
+  // Compiled treelite model interface
+  std::unique_ptr<CompiledModelInterface> m_compiled_model_interface;
 
 };
 } // namespace triggeralgs

@@ -60,7 +60,10 @@ add_library(triggeralgs SHARED
   src/TCMakerBSMWindowAlgorithm.cpp
   src/BSMWindow/WindowBin.cpp
   src/BSMWindow/BinnedWindow.cpp
+  src/BSMWindow/BSMWindow.cpp
   src/BSMWindow/TreeliteModelInterface.cpp
+  src/BSMWindow/CompiledModelInterface.cpp
+  src/BSMWindow/treelitemodel.c
   src/TAWindow.cpp
   src/TPWindow.cpp
   src/dbscan/dbscan.cpp
@@ -76,7 +79,7 @@ target_include_directories(triggeralgs PUBLIC
 set(CMAKE_INSTALL_RPATH "$ENV{HOME}/treelite-install/lib64")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-target_link_libraries(triggeralgs PRIVATE nlohmann_json::nlohmann_json detdataformats::detdataformats trgdataformats::trgdataformats cetlib::cetlib detchannelmaps::detchannelmaps treelite::treelite)
+target_link_libraries(triggeralgs PRIVATE nlohmann_json::nlohmann_json detdataformats::detdataformats trgdataformats::trgdataformats cetlib::cetlib detchannelmaps::detchannelmaps treelite::treelite )
 install(TARGETS triggeralgs EXPORT triggeralgsTargets)
 
 CONFIGURE_PACKAGE_CONFIG_FILE(cmake/triggeralgsConfig.cmake.in
