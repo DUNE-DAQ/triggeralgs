@@ -116,6 +116,11 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
   else if (m_algtype == 2) {
     std::cout << "Using XGBoost model with compiled Treelite inference window algorithm." << std::endl;
     const size_t num_feature = get_num_feature();
+    if (nbins != num_feature) {
+      std::cerr << "[ERROR] Using compiled model, so number of user-defined features " << nbins << 
+        " must match model number of features " << num_feature << "\n";
+      exit(1);
+    }
     flat_batched_Entries.clear();
     for (size_t i = 0; i < num_feature; ++i) {
       union Entry zero;
@@ -129,6 +134,7 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
   else {
     std::cerr << "[ERROR] unrecognised algorithm number " << m_algtype << ". Must be 0, 1 or 2\n";
     exit(1);
+  }
 }
 
 TAMakerBSMWindowAlgorithm::~TAMakerBSMWindowAlgorithm() {
