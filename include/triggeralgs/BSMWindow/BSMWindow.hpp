@@ -3,7 +3,7 @@
 
 #include "triggeralgs/TriggerPrimitive.hpp"
 #include "triggeralgs/Types.hpp"
-#include "triggeralgs/BSMWindow/models/treelite_compmodel_classifier_xgboost/treelitemodel.h"
+#include "triggeralgs/BSMWindow/models/treelitemodel.h"
 
 #include <ostream>
 #include <vector>
@@ -20,7 +20,8 @@ class BSMWindow {
     void reset(TriggerPrimitive const &input_tp);
 
     void bin_window(std::vector<float> &input, timestamp_t &bin_width,int &num_bins);
-    void bin_entry_window(std::vector<Entry> &input, timestamp_t &bin_width, int &num_bins);
+    void bin_window(std::vector<float> &input, timestamp_t time_bin_width, channel_t chan_bin_width, 
+                    int num_time_bins, int num_chan_bins, channel_t first_channel);
     void fill_entry_window(std::vector<Entry> &entry_input, std::vector<float> &input);
 
     float mean_sadc();

@@ -1,7 +1,7 @@
 #ifndef TRIGGERALGS_COMPILEDMODELINTERFACE_HPP_
 #define TRIGGERALGS_COMPILEDMODELINTERFACE_HPP_
 
-#include "triggeralgs/BSMWindow/models/treelite_compmodel_classifier_xgboost/treelitemodel.h"
+#include "triggeralgs/BSMWindow/models/treelitemodel.h"
 #include <string>
 #include <fstream>
 #include <algorithm>

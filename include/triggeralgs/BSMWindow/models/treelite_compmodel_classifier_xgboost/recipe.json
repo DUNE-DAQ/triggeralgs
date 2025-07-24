@@ -1,7 +1,0 @@
-{
-    "target": "treelite_compmodel_classifier_xgboost",
-    "sources": [{
-            "name": "main",
-            "length": 766
-        }]
-}

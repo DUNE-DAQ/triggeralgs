@@ -73,15 +73,22 @@ void BSMWindow::bin_window(std::vector<float> &input, timestamp_t &bin_width, in
   }
 };
 
-void BSMWindow::bin_entry_window(std::vector<Entry> &input, timestamp_t &bin_width, int &num_bins) {
-  for (auto &e : input) e.fvalue = 0.0;
+void BSMWindow::bin_window(std::vector<float> &input, timestamp_t time_bin_width, channel_t chan_bin_width, 
+                           int num_time_bins, int num_chan_bins, channel_t first_channel) {
+  std::fill(input.begin(), input.end(), 0.0f);
+
+  const float inv_time_bin_width = 1.0f / time_bin_width;
+  const float inv_chan_bin_width = 1.0f / chan_bin_width;
 
   for (const TriggerPrimitive& tp : tp_list) {
-    size_t bin_index = static_cast<size_t>((tp.time_start - time_start) / bin_width);
-    if (bin_index < num_bins) {
-      input[bin_index].fvalue += tp.adc_integral;
+    size_t time_bin = static_cast<size_t>((tp.time_start - time_start) * inv_time_bin_width);
+    size_t channel_bin = static_cast<size_t>((tp.channel - first_channel) * inv_chan_bin_width);
+    if (time_bin < num_time_bins && channel_bin < num_chan_bins) {
+      size_t index = channel_bin * num_time_bins + time_bin;
+      input[index] += tp.adc_integral;
     }
   }
+  input[num_time_bins * num_chan_bins] = adc_integral;
 };
 
 void BSMWindow::fill_entry_window(std::vector<Entry> &entry_input, std::vector<float> &input) {
@@ -91,10 +98,7 @@ void BSMWindow::fill_entry_window(std::vector<Entry> &entry_input, std::vector<f
 }
 
 float BSMWindow::mean_sadc() {
-  float ret = static_cast<float>(adc_integral / tp_list.size());;
-  //std::cout << "mean SADC = " << ret << "\n";
-  return ret;
-  //return static_cast<float>(adc_integral / tp_list.size());
+  return static_cast<float>(adc_integral / tp_list.size());;
 }
 float BSMWindow::mean_adc_peak() {
   return static_cast<float>(adc_peak_sum / tp_list.size());
