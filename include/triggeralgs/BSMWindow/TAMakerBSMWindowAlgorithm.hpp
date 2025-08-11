@@ -9,6 +9,7 @@
 #ifndef TRIGGERALGS_BSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
 #define TRIGGERALGS_BSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
 
+#include "detchannelmaps/TPCChannelMap.hpp"
 #include "triggeralgs/TriggerActivityFactory.hpp"
 #include "triggeralgs/Types.hpp"
 #include "triggeralgs/BSMWindow/WindowBin.hpp"

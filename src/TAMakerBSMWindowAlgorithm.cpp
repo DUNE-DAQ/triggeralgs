@@ -33,8 +33,8 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     channel_t n_channels_on_plane = static_cast<channel_t>(channelMap->get_nchannels_on_plane(input_tp.channel));
     m_last_channel = m_first_channel + n_channels_on_plane;
     m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
-    std::cout << "1st Chan = " << m_first_channel << ", 2nd Chan = " << m_last_channel << std::endl
-      << "Number of bins = " << m_num_chanbins << ", and bin length = " << m_chan_bin_length << std::endl;
+    std::cout << "1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
+      << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length << std::endl;
     return;
   } 
   
