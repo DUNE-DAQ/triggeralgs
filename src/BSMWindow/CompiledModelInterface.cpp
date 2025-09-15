@@ -19,11 +19,6 @@ void CompiledModelInterface::ModelWarmUp(Entry *input) {
 }
 
 void CompiledModelInterface::Predict(Entry *input, float *result) {
-  /*std::cout << "Input of size " << 20 << ": ";
-  for (int i = 0; i < 20; i++) {
-    std::cout << input[i].fvalue << ", ";
-  }
-  std::cout << "\n";*/
   for (int rid = 0; rid < num_batch; ++rid) {
     predict(input, 0, result);
   }
@@ -31,7 +26,6 @@ void CompiledModelInterface::Predict(Entry *input, float *result) {
 
 bool CompiledModelInterface::Classify(const float *result, float &bdt_threshold) {
   for (uint64_t rid = 0; rid < num_batch; rid++) {
-    //std::cout << "BDT output = " << result[rid] << "\n";
     if (result[rid] > bdt_threshold) {
       return true;
     }

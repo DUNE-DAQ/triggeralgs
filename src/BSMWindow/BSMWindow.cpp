@@ -12,7 +12,8 @@ bool BSMWindow::is_empty() const{
 
 void BSMWindow::add(TriggerPrimitive const &input_tp){
   // Add the input TP's contribution to the total ADC and add it to
-  // the TP list.
+  // the TP list. Also keep running sum of all the samples over threshold
+  // and the peak ADC. These are used for samples/peak ratio cut
   adc_integral += input_tp.adc_integral;
   adc_peak_sum += input_tp.adc_peak;
   tot_sum += input_tp.samples_over_threshold;

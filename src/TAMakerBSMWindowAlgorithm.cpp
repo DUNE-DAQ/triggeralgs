@@ -119,7 +119,7 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
 }
 
 TAMakerBSMWindowAlgorithm::~TAMakerBSMWindowAlgorithm() {
-  // Treelite smart ptr should clean itself up
+  // Nothing to clean up
 }
 
 TriggerActivity
@@ -127,7 +127,6 @@ TAMakerBSMWindowAlgorithm::construct_ta() const
 {
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] I am constructing a trigger activity!";
 
-  //TriggerPrimitive latest_tp_in_window = m_current_bin.tp_list.back();
   TriggerPrimitive latest_tp_in_window = m_current_window.tp_list.back();
   // The time_peak, time_activity, channel_* and adc_peak fields of this TA are irrelevent
   // for the purpose of this trigger alg.

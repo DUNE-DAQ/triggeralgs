@@ -18,7 +18,6 @@ find_package(detdataformats REQUIRED)
 find_package(trgdataformats REQUIRED)
 find_package(cetlib REQUIRED)
 find_package(detchannelmaps REQUIRED)
-find_package(Treelite REQUIRED)
 
 # We follow the daq-cmake convention of building one main library for
 # the package. In our case, we include all of the available trigger
@@ -73,10 +72,9 @@ target_include_directories(triggeralgs PUBLIC
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-set(CMAKE_INSTALL_RPATH "$ENV{HOME}/treelite-install/lib64")
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 
-target_link_libraries(triggeralgs PRIVATE nlohmann_json::nlohmann_json detdataformats::detdataformats trgdataformats::trgdataformats cetlib::cetlib detchannelmaps::detchannelmaps treelite::treelite )
+target_link_libraries(triggeralgs PRIVATE nlohmann_json::nlohmann_json detdataformats::detdataformats trgdataformats::trgdataformats cetlib::cetlib detchannelmaps::detchannelmaps )
 install(TARGETS triggeralgs EXPORT triggeralgsTargets)
 
 CONFIGURE_PACKAGE_CONFIG_FILE(cmake/triggeralgsConfig.cmake.in

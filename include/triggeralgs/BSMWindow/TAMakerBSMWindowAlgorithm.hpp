@@ -12,8 +12,6 @@
 #include "detchannelmaps/TPCChannelMap.hpp"
 #include "triggeralgs/TriggerActivityFactory.hpp"
 #include "triggeralgs/Types.hpp"
-#include "triggeralgs/BSMWindow/WindowBin.hpp"
-#include "triggeralgs/BSMWindow/BinnedWindow.hpp"
 #include "triggeralgs/BSMWindow/BSMWindow.hpp"
 #include "triggeralgs/BSMWindow/CompiledModelInterface.hpp"
 
@@ -51,8 +49,6 @@ private:
   std::vector<float> flat_batched_inputs;
   // row-major input for Entry objects used for compiled model
   std::vector<Entry> flat_batched_Entries;
-  // Keep track of the number of windows in the current batch
-  int nbatch_iterator = 0;
 
   // Configurable parameters.
   uint32_t m_adc_threshold = 200000;
