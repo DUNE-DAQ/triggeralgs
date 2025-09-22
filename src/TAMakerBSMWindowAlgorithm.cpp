@@ -33,15 +33,15 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     channel_t n_channels_on_plane = static_cast<channel_t>(channelMap->get_nchannels_on_plane(input_tp.channel));
     m_last_channel = m_first_channel + n_channels_on_plane;
     m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
-    std::cout << "1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
-      << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length << std::endl;
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
+      << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length;
     return;
   } 
   
   // If the difference between the current TP's start time and the start of the window
   // is less than the specified window size, add the TP to the window.
   if((input_tp.time_start - m_current_window.time_start) < m_window_length){
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Window not yet complete, adding the input_tp to the window.";
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Window not yet complete, adding the input_tp to the window.";
     m_current_window.add(input_tp);
   }
   // If the addition of the current TP to the window would make it longer
@@ -55,18 +55,18 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
       compute_treelite_classification() // XGBoost classifier 
       )
   {
-    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] ADC integral in window is greater than specified threshold.";
+    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] ADC integral in window is greater than specified threshold.";
     output_ta.push_back(construct_ta());
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Resetting window with input_tp.";
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Resetting window with input_tp.";
     m_current_window.reset(input_tp);
   }
   // If it is not, move the window along.
   else{
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:ADCSW] Window is at required length but adc threshold not met, shifting window along.";
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Window is at required length but adc threshold not met, shifting window along.";
     m_current_window.move(input_tp, m_window_length);
   }
   
-  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:ADCSW] " << m_current_window;
+  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] " << m_current_window;
 
   m_primitive_count++;
 
@@ -97,17 +97,16 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
     }
   }
   else{
-    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:ADCSW] The DEFAULT values of window_length and adc_threshold are being used.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:BSMW] The DEFAULT values of window_length and adc_threshold are being used.";
   }
   
-  std::cout << "Bin length is " << m_bin_length << " for a window of " << m_num_timebins << 
-    " bins. ADC threshold across window set to " << m_adc_threshold << std::endl;
+  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Bin length is " << m_bin_length << " for a window of " << m_num_timebins << 
+    " bins. ADC threshold across window set to " << m_adc_threshold;
 
   const size_t num_feature = get_num_feature();
   flat_batched_inputs.resize(num_feature);
 
   m_num_chanbins = num_feature / m_num_timebins;
-  std::cout << "Using 2D model. Set num chan bins to " << m_num_chanbins << std::endl;
 
   flat_batched_Entries.clear();
   for (size_t i = 0; i < num_feature; ++i) {
@@ -125,7 +124,7 @@ TAMakerBSMWindowAlgorithm::~TAMakerBSMWindowAlgorithm() {
 TriggerActivity
 TAMakerBSMWindowAlgorithm::construct_ta() const
 {
-  TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] I am constructing a trigger activity!";
+  TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] I am constructing a trigger activity!";
 
   TriggerPrimitive latest_tp_in_window = m_current_window.tp_list.back();
   // The time_peak, time_activity, channel_* and adc_peak fields of this TA are irrelevent
