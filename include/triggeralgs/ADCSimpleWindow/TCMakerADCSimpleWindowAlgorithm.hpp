@@ -26,6 +26,8 @@ public:
 private:
 
   uint64_t m_activity_count = 0; // NOLINT(build/unsigned)
+
+  std::vector<TriggerActivity> m_ta_list;
   
 };
 
