@@ -86,9 +86,16 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
 
   const TriggerPrimitive& latest_tp_in_window = m_current_window.tp_list.back();
   uint64_t ch_min{latest_tp_in_window.channel}, ch_max{latest_tp_in_window.channel};
+
+  std::vector<TriggerPrimitive> tp_list;
+  tp_list.reserve(m_current_window.tp_list.size());
+
   for( const auto& tp : m_current_window.tp_list ) {
+    
     ch_min = std::min(ch_min, tp.channel);
     ch_max = std::max(ch_max, tp.channel);
+
+    tp_list.push_back(tp);
   }
 
   TriggerActivity ta;
@@ -104,7 +111,7 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   ta.detid = latest_tp_in_window.detid;
   ta.type = TriggerActivity::Type::kTPC;
   ta.algorithm = TriggerActivity::Algorithm::kADCSimpleWindow;
-  ta.inputs = m_current_window.tp_list;
+  ta.inputs.swap(tp_list);
   return ta;
 }
 

@@ -22,6 +22,7 @@ TCMakerADCSimpleWindowAlgorithm::process(const TriggerActivity& activity, std::v
 
   
   // Accumulate TAs with the same start time
+  // FIXME: accumulation relies on the "next" event to release the accumulated values.
   if (m_ta_list.empty() or activity.time_start == m_ta_list.front().time_start) {
     m_ta_list.push_back(activity);
     return;
