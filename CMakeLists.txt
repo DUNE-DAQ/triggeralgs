@@ -71,9 +71,6 @@ target_include_directories(triggeralgs PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
-
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-
 target_link_libraries(triggeralgs PRIVATE nlohmann_json::nlohmann_json detdataformats::detdataformats trgdataformats::trgdataformats cetlib::cetlib detchannelmaps::detchannelmaps )
 install(TARGETS triggeralgs EXPORT triggeralgsTargets)
 
