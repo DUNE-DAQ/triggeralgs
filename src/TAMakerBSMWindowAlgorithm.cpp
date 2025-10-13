@@ -29,8 +29,18 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     m_last_pred_time = input_tp.time_start;
     m_primitive_count++;
     // first time operator is called set ROP first and last channel
-    m_first_channel = static_cast<channel_t>(channelMap->get_first_channel_on_plane(input_tp.channel));
-    channel_t n_channels_on_plane = static_cast<channel_t>(channelMap->get_nchannels_on_plane(input_tp.channel));
+    unsigned int detelement = channelMap->get_element_id_from_offline_channel(input_tp.channel);
+    unsigned int plane = channelMap->get_plane_from_offline_channel(input_tp.channel);
+
+    // First arg hard-coded to 1 - bad. TODO: choose correct plane range map
+    // based on detid in detchannelmap. Fine for now as we only run with PD-VD for
+    // DAQ testing.
+    PlaneInfo plane_info = get_plane_info(1, detelement, plane);
+    m_first_channel = static_cast<channel_t>(plane_info.min_channel);
+    channel_t n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
+
+    //m_first_channel = static_cast<channel_t>(channelMap->get_first_channel_on_plane(input_tp.channel));
+    //channel_t n_channels_on_plane = static_cast<channel_t>(channelMap->get_nchannels_on_plane(input_tp.channel));
     m_last_channel = m_first_channel + n_channels_on_plane;
     m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
@@ -160,6 +170,20 @@ bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
   
   return m_compiled_model_interface->Classify(result.data(), m_bdt_threshold);
 
+}
+  
+TAMakerBSMWindowAlgorithm::PlaneInfo TAMakerBSMWindowAlgorithm::get_plane_info(int detid, int detelement, int plane) {
+
+  const std::map<std::pair<int,int>, PlaneInfo> *plane_map;
+  if (detid == 0) plane_map = &pdhd_plane_map;
+  else if (detid == 1) plane_map = &pdvd_plane_map;
+  else plane_map = &pdhd_plane_map;
+
+  auto it = plane_map->find({detelement, plane});
+  if (it == plane_map->end()) {
+    throw std::out_of_range("Invalid detelement/plane combination");
+  }
+  return it->second;
 }
 
 // Register algo in TA Factory
