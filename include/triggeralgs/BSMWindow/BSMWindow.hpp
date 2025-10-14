@@ -3,7 +3,7 @@
 
 #include "triggeralgs/TriggerPrimitive.hpp"
 #include "triggeralgs/Types.hpp"
-#include "triggeralgs/BSMWindow/models/treelitemodel.h"
+#include "triggeralgs/BSMWindow/treelitemodel.hpp"
 
 #include <ostream>
 #include <vector>

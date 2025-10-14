@@ -32,15 +32,10 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     unsigned int detelement = channelMap->get_element_id_from_offline_channel(input_tp.channel);
     unsigned int plane = channelMap->get_plane_from_offline_channel(input_tp.channel);
 
-    // First arg hard-coded to 1 - bad. TODO: choose correct plane range map
-    // based on detid in detchannelmap. Fine for now as we only run with PD-VD for
-    // DAQ testing.
-    PlaneInfo plane_info = get_plane_info(1, detelement, plane);
+    PlaneInfo plane_info = m_det_plane_map.get_plane_info(m_channel_map_name, detelement, plane);
     m_first_channel = static_cast<channel_t>(plane_info.min_channel);
     channel_t n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
 
-    //m_first_channel = static_cast<channel_t>(channelMap->get_first_channel_on_plane(input_tp.channel));
-    //channel_t n_channels_on_plane = static_cast<channel_t>(channelMap->get_nchannels_on_plane(input_tp.channel));
     m_last_channel = m_first_channel + n_channels_on_plane;
     m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
@@ -88,6 +83,7 @@ void
 TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
 {
   if (config.is_object()){
+    if (config.contains("channel_map_name")) m_channel_map_name = config["channel_map_name"];
     if (config.contains("num_time_bins")) m_num_timebins = config["num_time_bins"];
     if (config.contains("adc_threshold")) m_adc_threshold = config["adc_threshold"];
     if (config.contains("ratio_threshold")) {
@@ -112,8 +108,13 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
   
   TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Bin length is " << m_bin_length << " for a window of " << m_num_timebins << 
     " bins. ADC threshold across window set to " << m_adc_threshold;
+  
+  channelMap = dunedaq::detchannelmaps::make_tpc_map(m_channel_map_name);
+  
+  m_compiled_model_interface = std::make_unique<CompiledModelInterface>(nbatch);
 
-  const size_t num_feature = get_num_feature();
+  const size_t num_feature = m_compiled_model_interface->GetNumFeatures();
+
   flat_batched_inputs.resize(num_feature);
 
   m_num_chanbins = num_feature / m_num_timebins;
@@ -124,7 +125,6 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
     zero.fvalue = 0.0;
     flat_batched_Entries.emplace_back(zero);
   }
-  m_compiled_model_interface = std::make_unique<CompiledModelInterface>(nbatch);
 }
 
 TAMakerBSMWindowAlgorithm::~TAMakerBSMWindowAlgorithm() {
@@ -171,20 +171,5 @@ bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
   return m_compiled_model_interface->Classify(result.data(), m_bdt_threshold);
 
 }
-  
-TAMakerBSMWindowAlgorithm::PlaneInfo TAMakerBSMWindowAlgorithm::get_plane_info(int detid, int detelement, int plane) {
-
-  const std::map<std::pair<int,int>, PlaneInfo> *plane_map;
-  if (detid == 0) plane_map = &pdhd_plane_map;
-  else if (detid == 1) plane_map = &pdvd_plane_map;
-  else plane_map = &pdhd_plane_map;
-
-  auto it = plane_map->find({detelement, plane});
-  if (it == plane_map->end()) {
-    throw std::out_of_range("Invalid detelement/plane combination");
-  }
-  return it->second;
-}
-
 // Register algo in TA Factory
 REGISTER_TRIGGER_ACTIVITY_MAKER(TRACE_NAME, TAMakerBSMWindowAlgorithm)

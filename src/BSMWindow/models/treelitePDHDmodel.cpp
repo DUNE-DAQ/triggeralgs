@@ -1,28 +1,12 @@
+#include "triggeralgs/BSMWindow/treelitemodel.hpp"
 
-#include "triggeralgs/BSMWindow/models/treelitemodel.h"
+namespace triggeralgs {
 
-
-static const int32_t num_class[] = {  1, };
-
-int32_t get_num_target(void) {
-  return N_TARGET;
-}
-void get_num_class(int32_t* out) {
-  for (int i = 0; i < N_TARGET; ++i) {
-    out[i] = num_class[i];
-  }
-}
-int32_t get_num_feature(void) {
+int32_t TreelitePDHDModel::get_num_feature(void) const {
   return 26;
 }
-const char* get_threshold_type(void) {
-  return "float32";
-}
-const char* get_leaf_output_type(void) {
-  return "float32";
-}
 
-void predict(union Entry* data, int pred_margin, float* result) {
+void TreelitePDHDModel::predict(union Entry* data, int pred_margin, float* result) const {
   unsigned int tmp;
   if ( (data[25].missing != -1) && (data[25].fvalue < (float)4175910)) {
     if ( (data[22].missing != -1) && (data[22].fvalue < (float)154028)) {
@@ -5610,11 +5594,4 @@ void predict(union Entry* data, int pred_margin, float* result) {
   if (!pred_margin) { postprocess(result); }
 }
 
-void postprocess(float* result) {
-  // sigmoid
-  const float alpha = (float)1;
-  for (size_t i = 0; i < N_TARGET * MAX_N_CLASS; ++i) {
-    result[i] = (float)(1) / ((float)(1) + expf(-alpha * result[i]));
-  }
-}
-
+} // end triggeralgs namespace
