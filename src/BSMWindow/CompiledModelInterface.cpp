@@ -20,7 +20,6 @@ void CompiledModelInterface::ModelWarmUp(Entry *input) {
   for (int rid = 0; rid < num_batch; ++rid) {
     for (int i = 0; i < 100; i++) {
       model_ptr->predict(input, 0, result);
-      //predict(input, 0, result);
     }
   }
 }
@@ -28,7 +27,6 @@ void CompiledModelInterface::ModelWarmUp(Entry *input) {
 void CompiledModelInterface::Predict(Entry *input, float *result) {
   for (int rid = 0; rid < num_batch; ++rid) {
     model_ptr->predict(input, 0, result);
-    //predict(input, 0, result);
   }
 }
 

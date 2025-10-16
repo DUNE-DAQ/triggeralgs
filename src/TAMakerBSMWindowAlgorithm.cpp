@@ -36,8 +36,18 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     m_first_channel = static_cast<channel_t>(plane_info.min_channel);
     channel_t n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
 
-    m_last_channel = m_first_channel + n_channels_on_plane;
-    m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
+    // If we are in PD-VD use 'effective' channel mapping for CRPs
+    if (m_pdvd_map) {
+      m_pdvd_eff_channel_mapper = std::make_unique<PDVDEffectiveChannelMap>(plane_info.min_channel, plane_info.n_channels);
+
+      m_first_channel = m_pdvd_eff_channel_mapper->remapCollectionPlaneChannel(m_first_channel);
+      m_last_channel = m_first_channel + m_pdvd_eff_channel_mapper->getNEffectiveChannels();
+      m_chan_bin_length = m_pdvd_eff_channel_mapper->getNEffectiveChannels() / m_num_chanbins;
+    } else { // still in PD-HD, so don't need effective channel
+      m_last_channel = m_first_channel + n_channels_on_plane;
+      m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
+    }
+
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
       << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length;
     return;
@@ -110,6 +120,14 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
     " bins. ADC threshold across window set to " << m_adc_threshold;
   
   channelMap = dunedaq::detchannelmaps::make_tpc_map(m_channel_map_name);
+
+  // If we are in PD-VD, set boolean to true to enable effective channel mapping
+  if (m_channel_map_name == "PD2VDTPCChannelMap" || m_channel_map_name == "PD2VDBottomTPCChannelMap" ||
+      m_channel_map_name == "PD2VDTopTPCChannelMap") {
+    m_pdvd_map = true;
+  } else { // else we are in PD-HD and we use true channel mapping
+    m_pdvd_map = false;
+  }
   
   m_compiled_model_interface = std::make_unique<CompiledModelInterface>(nbatch);
 
@@ -160,7 +178,12 @@ bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
   
   m_last_pred_time = m_current_window.time_start;
   
-  m_current_window.bin_window(flat_batched_inputs, m_bin_length, m_chan_bin_length, m_num_timebins, m_num_chanbins, m_first_channel);
+  m_current_window.bin_window(
+      flat_batched_inputs, m_bin_length, 
+      m_chan_bin_length, m_num_timebins, 
+      m_num_chanbins, m_first_channel, 
+      m_pdvd_eff_channel_mapper, m_pdvd_map
+      );
   
   m_current_window.fill_entry_window(flat_batched_Entries, flat_batched_inputs); 
     
@@ -171,5 +194,6 @@ bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
   return m_compiled_model_interface->Classify(result.data(), m_bdt_threshold);
 
 }
+
 // Register algo in TA Factory
 REGISTER_TRIGGER_ACTIVITY_MAKER(TRACE_NAME, TAMakerBSMWindowAlgorithm)

@@ -62,28 +62,25 @@ void BSMWindow::reset(TriggerPrimitive const &input_tp){
   tp_list.push_back(input_tp);
 };
 
-void BSMWindow::bin_window(std::vector<float> &input, timestamp_t &bin_width, int &num_bins) {
-  std::fill(input.begin(), input.end(), 0.0f);
-
-  for (const TriggerPrimitive& tp : tp_list) {
-
-    size_t bin_index = static_cast<size_t>((tp.time_start - time_start) / bin_width);
-    if (bin_index < num_bins) {
-      input[bin_index] += tp.adc_integral;
-    }
-  }
-};
-
-void BSMWindow::bin_window(std::vector<float> &input, timestamp_t time_bin_width, channel_t chan_bin_width, 
-                           int num_time_bins, int num_chan_bins, channel_t first_channel) {
+void BSMWindow::bin_window(
+    std::vector<float> &input, timestamp_t time_bin_width, 
+    channel_t chan_bin_width, int num_time_bins, 
+    int num_chan_bins, channel_t first_channel,
+    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper, 
+    bool use_pdvd_map) {
   std::fill(input.begin(), input.end(), 0.0f);
 
   const float inv_time_bin_width = 1.0f / time_bin_width;
   const float inv_chan_bin_width = 1.0f / chan_bin_width;
 
   for (const TriggerPrimitive& tp : tp_list) {
+    channel_t temp_tp_channel = tp.channel;
+    // If in PD-VD convert to effective channel here
+    if (effective_channel_mapper && use_pdvd_map) {
+      temp_tp_channel = effective_channel_mapper->remapCollectionPlaneChannel(temp_tp_channel);
+    }
     size_t time_bin = static_cast<size_t>((tp.time_start - time_start) * inv_time_bin_width);
-    size_t channel_bin = static_cast<size_t>((tp.channel - first_channel) * inv_chan_bin_width);
+    size_t channel_bin = static_cast<size_t>((temp_tp_channel - first_channel) * inv_chan_bin_width);
     if (time_bin < num_time_bins && channel_bin < num_chan_bins) {
       size_t index = channel_bin * num_time_bins + time_bin;
       input[index] += tp.adc_integral;

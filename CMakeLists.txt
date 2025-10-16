@@ -58,6 +58,7 @@ add_library(triggeralgs SHARED
   src/TAMakerBSMWindowAlgorithm.cpp
   src/TCMakerBSMWindowAlgorithm.cpp
   src/BSMWindow/DetectorPlaneMap.cpp
+  src/BSMWindow/PDVDEffectiveChannelMap.cpp 
   src/BSMWindow/BSMWindow.cpp
   src/BSMWindow/treelitemodel.cpp
   src/BSMWindow/models/treelitePDHDmodel.cpp

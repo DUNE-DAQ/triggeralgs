@@ -2,6 +2,9 @@
 
 namespace triggeralgs {
 
+// Implement functions of TreeliteModelBase base class
+// that are common to all compiled GBDT models
+
 const int32_t TreeliteModelBase::num_class[1] = { 1 };
 
 TreeliteModelBase::TreeliteModelBase(int numTargets, int maxNumClass)

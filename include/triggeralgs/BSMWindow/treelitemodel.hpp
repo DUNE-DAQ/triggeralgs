@@ -31,18 +31,17 @@ namespace triggeralgs {
 
     int32_t get_num_target() const;
     void get_num_class(int32_t* out) const;
-    //virtual int32_t get_num_feature() const;
+    // Different models may have different number of feature
+    // - make this function virtual and always override it
     virtual int32_t get_num_feature() const = 0;
 
     virtual const char* get_threshold_type() const;
     virtual const char* get_leaf_output_type() const;
 
     //Virtual prediction function — overridden by each concrete model
-    //virtual void predict(const std::vector<Entry>& data, bool predMargin, std::vector<float>& result) const = 0;
     virtual void predict(union Entry* data, int pred_margin, float* result) const = 0;
 
     // Common postprocessing shared by all models
-    //virtual void postprocess(std::vector<float>& result) const;
     virtual void postprocess(float* result) const;
 
     protected:
@@ -56,7 +55,6 @@ namespace triggeralgs {
   public:
     using TreeliteModelBase::TreeliteModelBase;
     virtual int32_t get_num_feature() const override;
-    //void predict(const std::vector<Entry>& data, bool predMargin, std::vector<float>& result) const override;
     void predict(union Entry* data, int pred_margin, float* result) const override;
   };
 

@@ -15,6 +15,7 @@
 #include "triggeralgs/BSMWindow/BSMWindow.hpp"
 #include "triggeralgs/BSMWindow/CompiledModelInterface.hpp"
 #include "triggeralgs/BSMWindow/DetectorPlaneMap.hpp"
+#include "triggeralgs/BSMWindow/PDVDEffectiveChannelMap.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -35,7 +36,7 @@ private:
   bool compute_treelite_classification();
 
   TriggerActivity construct_ta() const;
-
+  
   // The current time window of TPs
   BSMWindow m_current_window;
 
@@ -71,6 +72,12 @@ private:
   // in a plane not in channel map by default, so add 
   // a struct to access these values
   DetectorPlaneMap m_det_plane_map;
+  // In PD-VD want to work with effective offline channel
+  // rather than the true offline channel. Have an object that helps
+  // to do this. It prevents gaps in channel vs time images
+  std::unique_ptr<PDVDEffectiveChannelMap> m_pdvd_eff_channel_mapper = nullptr;
+  // If in NP02 and using a PD-VD channel map, set this to true
+  bool m_pdvd_map = true;
   // first and last channel on the plane
   channel_t m_first_channel;
   channel_t m_last_channel;

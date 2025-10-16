@@ -13,6 +13,8 @@ namespace triggeralgs {
     int n_channels;
   };
 
+  // Provides mapping of plane and TPC ID to the first channel 
+  // and number of channels on that plane
   struct DetectorPlaneMap {
     const std::map<std::pair<int,int>, PlaneInfo> pdhd_plane_map = {
       {{0,0}, {400,400}}, 
