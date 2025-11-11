@@ -18,6 +18,18 @@ namespace triggeralgs {
 
 struct TriggerActivity : public dunedaq::trgdataformats::TriggerActivityData
 {
+  TriggerActivity() = default;
+  TriggerActivity(const TriggerActivity&) = default;
+  TriggerActivity(TriggerActivity&&) = default;
+  TriggerActivity& operator=(const TriggerActivity&) = default;
+  TriggerActivity& operator=(TriggerActivity&&) = default;
+  ~TriggerActivity() = default;
+
+  TriggerActivity(dunedaq::trgdataformats::TriggerActivityData&& data)
+      : dunedaq::trgdataformats::TriggerActivityData(std::move(data)) {}
+  TriggerActivity(const dunedaq::trgdataformats::TriggerActivityData &data)
+      : dunedaq::trgdataformats::TriggerActivityData(data) {}
+
   std::vector<TriggerPrimitive> inputs;
 };
 
