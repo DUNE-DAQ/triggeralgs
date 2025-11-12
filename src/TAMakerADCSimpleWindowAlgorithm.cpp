@@ -86,6 +86,11 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
 
   const TriggerPrimitive& latest_tp_in_window = m_current_window.tp_list.back();
   uint64_t ch_min{latest_tp_in_window.channel}, ch_max{latest_tp_in_window.channel};
+  uint64_t time_max{latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32};
+
+  uint64_t adc_peak{latest_tp_in_window.adc_peak};
+  uint64_t ch_peak{dunedaq::trgdataformats::INVALID_CHANNEL};
+  timestamp_t time_peak{dunedaq::trgdataformats::INVALID_TIMESTAMP};
 
   std::vector<TriggerPrimitive> tp_list;
   tp_list.reserve(m_current_window.tp_list.size());
@@ -94,20 +99,26 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
     
     ch_min = std::min(ch_min, tp.channel);
     ch_max = std::max(ch_max, tp.channel);
+    time_max = std::max(time_max, tp.time_start + tp.samples_over_threshold * 32);
+    if (tp.adc_peak > adc_peak) {
+      adc_peak = tp.adc_peak;
+      ch_peak = tp.channel;
+      time_peak = time_peak;
+    }
 
     tp_list.push_back(tp);
   }
 
   TriggerActivity ta;
   ta.time_start = m_current_window.time_start;
-  ta.time_end = latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32;  // FIXME: Replace the hard-coded SOT to TOT scaling.
-  ta.time_peak = latest_tp_in_window.samples_to_peak * 32 + latest_tp_in_window.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+  ta.time_end = time_max; 
+  ta.time_peak = time_peak;
   ta.time_activity = ta.time_peak;
   ta.channel_start = ch_min;
   ta.channel_end = ch_max;
-  ta.channel_peak = latest_tp_in_window.channel;
+  ta.channel_peak = ch_peak;
   ta.adc_integral = m_current_window.adc_integral;
-  ta.adc_peak = latest_tp_in_window.adc_peak;
+  ta.adc_peak = adc_peak;
   ta.detid = latest_tp_in_window.detid;
   ta.type = TriggerActivity::Type::kTPC;
   ta.algorithm = TriggerActivity::Algorithm::kADCSimpleWindow;
