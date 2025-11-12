@@ -84,23 +84,34 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] I am constructing a trigger activity!";
   //TLOG_DEBUG(TRACE_NAME) << m_current_window;
 
-  TriggerPrimitive latest_tp_in_window = m_current_window.tp_list.back();
-  // The time_peak, time_activity, channel_* and adc_peak fields of this TA are irrelevent
-  // for the purpose of this trigger alg.
+  const TriggerPrimitive& latest_tp_in_window = m_current_window.tp_list.back();
+  uint64_t ch_min{latest_tp_in_window.channel}, ch_max{latest_tp_in_window.channel};
+
+  std::vector<TriggerPrimitive> tp_list;
+  tp_list.reserve(m_current_window.tp_list.size());
+
+  for( const auto& tp : m_current_window.tp_list ) {
+    
+    ch_min = std::min(ch_min, tp.channel);
+    ch_max = std::max(ch_max, tp.channel);
+
+    tp_list.push_back(tp);
+  }
+
   TriggerActivity ta;
   ta.time_start = m_current_window.time_start;
   ta.time_end = latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32;  // FIXME: Replace the hard-coded SOT to TOT scaling.
   ta.time_peak = latest_tp_in_window.samples_to_peak * 32 + latest_tp_in_window.time_start;  // FIXME: Replace STP to `time_peak` conversion.
   ta.time_activity = ta.time_peak;
-  ta.channel_start = latest_tp_in_window.channel;
-  ta.channel_end = latest_tp_in_window.channel;
+  ta.channel_start = ch_min;
+  ta.channel_end = ch_max;
   ta.channel_peak = latest_tp_in_window.channel;
   ta.adc_integral = m_current_window.adc_integral;
   ta.adc_peak = latest_tp_in_window.adc_peak;
   ta.detid = latest_tp_in_window.detid;
   ta.type = TriggerActivity::Type::kTPC;
   ta.algorithm = TriggerActivity::Algorithm::kADCSimpleWindow;
-  ta.inputs = m_current_window.tp_list;
+  ta.inputs.swap(tp_list);
   return ta;
 }
 
