@@ -14,11 +14,79 @@
 #include <vector>
 
 
-using namespace triggeralgs;
+
+
+namespace triggeralgs {
+
+// using namespace triggeralgs;
 using Logging::TLVL_DEBUG_ALL;
 using Logging::TLVL_DEBUG_HIGH;
 using Logging::TLVL_DEBUG_LOW;
 using Logging::TLVL_IMPORTANT;
+
+void
+TAMakerADCSimpleWindowAlgorithm::Window::add(TriggerPrimitive const &input_tp){
+  // Add the input TP's contribution to the total ADC and add it to
+  // the TP list.
+  adc_integral += input_tp.adc_integral;
+  tp_list.push_back(input_tp);
+};
+
+void 
+TAMakerADCSimpleWindowAlgorithm::Window::move(TriggerPrimitive const &input_tp, timestamp_t const &window_length){
+  // Find all of the TPs in the window that need to be removed
+  // if the input_tp is to be added and the size of the window
+  // is to be conserved.
+  // Substract those TPs' contribution from the total window ADC.
+  uint32_t n_tps_to_erase = 0;
+  for(auto tp : tp_list){
+    if(!(input_tp.time_start-tp.time_start < window_length)){
+      n_tps_to_erase++;
+      adc_integral -= tp.adc_integral;
+    }
+    else break;
+  }
+  // Erase the TPs from the window.
+  tp_list.erase(tp_list.begin(), tp_list.begin()+n_tps_to_erase);
+  // Make the window start time the start time of what is now the
+  // first TP.
+  if(tp_list.size()!=0){
+    time_start = tp_list.front().time_start;
+    add(input_tp);
+  }
+  else reset(input_tp);
+};
+
+
+void 
+TAMakerADCSimpleWindowAlgorithm::Window::reset(TriggerPrimitive const &input_tp){
+  // Empty the TP list.
+  tp_list.clear();
+  // Set the start time of the window to be the start time of the 
+  // input_tp.
+  time_start = input_tp.time_start;
+  // Start the total ADC integral.
+  adc_integral = input_tp.adc_integral;
+  // Add the input TP to the TP list.
+  tp_list.push_back(input_tp);
+};
+
+
+
+std::ostream& 
+operator<<(std::ostream& os, const TAMakerADCSimpleWindowAlgorithm::Window& window)
+{
+    if (window.is_empty()) {
+        os << "Window is empty!\n";
+    } else {
+        os << "Window start: " << window.time_start
+           << ", end: " << window.tp_list.back().time_start
+           << ". Total of: " << window.adc_integral
+           << " ADC counts with " << window.tp_list.size()
+           << " TPs.\n";
+    }
+    return os;
+}
 
 void
 TAMakerADCSimpleWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
@@ -86,7 +154,7 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
 
   const TriggerPrimitive& latest_tp_in_window = m_current_window.tp_list.back();
   uint64_t ch_min{latest_tp_in_window.channel}, ch_max{latest_tp_in_window.channel};
-  uint64_t time_max{latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32};
+  uint64_t time_min{latest_tp_in_window.time_start}, time_max{latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32};
 
   uint64_t adc_peak{latest_tp_in_window.adc_peak};
   uint64_t ch_peak{dunedaq::trgdataformats::INVALID_CHANNEL};
@@ -95,10 +163,14 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   std::vector<TriggerPrimitive> tp_list;
   tp_list.reserve(m_current_window.tp_list.size());
 
+
+  // Copy the queue into the vector
+  // And compute TA parameters
   for( const auto& tp : m_current_window.tp_list ) {
     
     ch_min = std::min(ch_min, tp.channel);
     ch_max = std::max(ch_max, tp.channel);
+    time_min = std::min(time_min, tp.time_start);
     time_max = std::max(time_max, tp.time_start + tp.samples_over_threshold * 32);
     if (tp.adc_peak > adc_peak) {
       adc_peak = tp.adc_peak;
@@ -110,10 +182,11 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   }
 
   TriggerActivity ta;
-  ta.time_start = m_current_window.time_start;
+
+  ta.time_start = time_min;
   ta.time_end = time_max; 
   ta.time_peak = time_peak;
-  ta.time_activity = ta.time_peak;
+  ta.time_activity = time_peak;
   ta.channel_start = ch_min;
   ta.channel_end = ch_max;
   ta.channel_peak = ch_peak;
@@ -126,5 +199,8 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   return ta;
 }
 
+
 // Register algo in TA Factory
 REGISTER_TRIGGER_ACTIVITY_MAKER(TRACE_NAME, TAMakerADCSimpleWindowAlgorithm)
+
+}
