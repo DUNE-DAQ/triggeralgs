@@ -92,6 +92,16 @@ public:
     // Apply prescale by erasing TAs
     if (m_prescale > 1) {
       for (std::vector<TriggerActivity>::iterator iter = output_ta.begin(); iter != output_ta.end();) {
+        if (iter->inputs.size() > 0) {
+          TLOG_DEBUG(0) << "Received TA with time start/end/activity: " << iter->time_start
+                        << " " << iter->time_end << " " << iter->time_activity
+                        << ", input TP time_start/channel: " << iter->inputs[0].time_start
+                        << " " << iter->inputs[0].channel;
+        } else {
+          TLOG_DEBUG(0) << "Received TA with time start/end/activity: " << iter->time_start
+                        << " " << iter->time_end << " " << iter->time_activity;
+        }
+
         m_ta_count++;
 
         if (m_ta_count % m_prescale != 0) {
@@ -99,7 +109,7 @@ public:
           continue;
         }
 
-        TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "Emitting prescaled TriggerActivity " << (m_ta_count-1)
+        TLOG_DEBUG(0) << "Emitting prescaled TriggerActivity " << (m_ta_count-1)
                                       << " with time start/end/activity: " << iter->time_start
                                       << " " << iter->time_end << " " << iter->time_activity;
         ++iter;
