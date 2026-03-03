@@ -1,4 +1,4 @@
-#include "triggeralgs/BSMWindow/CompiledModelInterface.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/CompiledModelInterface.hpp"
 
 #include <iostream>
 

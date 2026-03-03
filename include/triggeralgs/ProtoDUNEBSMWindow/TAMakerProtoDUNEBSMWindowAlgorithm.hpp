@@ -1,34 +1,34 @@
 /**
- * @file TAMakerBSMWindowAlgorithm.hpp
+ * @file TAMakerProtoDUNEBSMWindowAlgorithm.hpp
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2021.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#ifndef TRIGGERALGS_BSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
-#define TRIGGERALGS_BSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
+#ifndef TRIGGERALGS_PROTODUNEBSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
+#define TRIGGERALGS_PROTODUNEBSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
 
 #include "detchannelmaps/TPCChannelMap.hpp"
 #include "triggeralgs/TriggerActivityFactory.hpp"
 #include "triggeralgs/Types.hpp"
-#include "triggeralgs/BSMWindow/BSMWindow.hpp"
-#include "triggeralgs/BSMWindow/CompiledModelInterface.hpp"
-#include "triggeralgs/BSMWindow/DetectorPlaneMap.hpp"
-#include "triggeralgs/BSMWindow/PDVDEffectiveChannelMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/CompiledModelInterface.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/DetectorPlaneMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/PDVDEffectiveChannelMap.hpp"
 
 #include <vector>
 #include <algorithm>
 
 namespace triggeralgs {
-class TAMakerBSMWindowAlgorithm : public TriggerActivityMaker
+class TAMakerProtoDUNEBSMWindowAlgorithm : public TriggerActivityMaker
 {
 
 public:
   void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta); 
   void configure(const nlohmann::json &config);
 
-  ~TAMakerBSMWindowAlgorithm() override;
+  ~TAMakerProtoDUNEBSMWindowAlgorithm() override;
 
 private:
   // Function to handle XGBoost classification
@@ -38,7 +38,7 @@ private:
   TriggerActivity construct_ta() const;
   
   // The current time window of TPs
-  BSMWindow m_current_window;
+  ProtoDUNEBSMWindow m_current_window;
 
   timestamp_t m_last_pred_time;
   uint64_t m_primitive_count = 0;
@@ -88,4 +88,4 @@ private:
 };
 } // namespace triggeralgs
 
-#endif // TRIGGERALGS_BSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
+#endif // TRIGGERALGS_PROTODUNEBSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_

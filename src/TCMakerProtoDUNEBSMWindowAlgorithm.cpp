@@ -1,15 +1,15 @@
 /**
- * @file TCMakerBSMWindowAlgorithm.cpp
+ * @file TCMakerProtoDUNEBSMWindowAlgorithm.cpp
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2021.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "triggeralgs/BSMWindow/TCMakerBSMWindowAlgorithm.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/TCMakerProtoDUNEBSMWindowAlgorithm.hpp"
 
 #include "TRACE/trace.h"
-#define TRACE_NAME "TCMakerBSMWindowAlgorithm"
+#define TRACE_NAME "TCMakerProtoDUNEBSMWindowAlgorithm"
 
 #include <vector>
 
@@ -17,8 +17,8 @@ using namespace triggeralgs;
 
 using Logging::TLVL_DEBUG_LOW;
 
-void TCMakerBSMWindowAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
-//TCMakerBSMWindowAlgorithm::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
+void TCMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
+//TCMakerProtoDUNEBSMWindowAlgorithm::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
 { 
 
   // For now, if there is any single activity from any one detector element, emit
@@ -46,7 +46,7 @@ void TCMakerBSMWindowAlgorithm::process(const TriggerActivity& activity, std::ve
 }
 
 void
-TCMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
+TCMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
 {
   TriggerCandidateMaker::configure(config);
   /*
@@ -71,4 +71,4 @@ TCMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
   */
 }
 
-REGISTER_TRIGGER_CANDIDATE_MAKER(TRACE_NAME, TCMakerBSMWindowAlgorithm)
+REGISTER_TRIGGER_CANDIDATE_MAKER(TRACE_NAME, TCMakerProtoDUNEBSMWindowAlgorithm)

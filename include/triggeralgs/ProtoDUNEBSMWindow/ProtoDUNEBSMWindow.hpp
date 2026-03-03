@@ -1,10 +1,10 @@
-#ifndef TRIGGERALGS_BSMWINDOW_HPP_
-#define TRIGGERALGS_BSMWINDOW_HPP_
+#ifndef TRIGGERALGS_PROTODUNEBSMWINDOW_HPP_
+#define TRIGGERALGS_PROTODUNEBSMWINDOW_HPP_
 
 #include "triggeralgs/TriggerPrimitive.hpp"
 #include "triggeralgs/Types.hpp"
-#include "triggeralgs/BSMWindow/treelitemodel.hpp"
-#include "triggeralgs/BSMWindow/PDVDEffectiveChannelMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/treelitemodel.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/PDVDEffectiveChannelMap.hpp"
 
 #include <ostream>
 #include <vector>
@@ -17,7 +17,7 @@ namespace triggeralgs {
 // old TPs and add in newer ones
 // Function to bin the TPs in the window as a function of
 // channel and time
-class BSMWindow {
+class ProtoDUNEBSMWindow {
   public:
     bool is_empty() const;
     void add(TriggerPrimitive const &input_tp);
@@ -38,7 +38,7 @@ class BSMWindow {
     float mean_adc_peak();
     float mean_tot();
 
-    friend std::ostream& operator<<(std::ostream& os, const BSMWindow& window);
+    friend std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window);
 
     timestamp_t time_start;
     uint32_t adc_integral;
@@ -47,4 +47,4 @@ class BSMWindow {
     std::vector<TriggerPrimitive> tp_list;
   };
 }
-#endif // TRIGGERALGS_BSMWINDOW_HPP_
+#endif // TRIGGERALGS_PROTODUNEBSMWINDOW_HPP_

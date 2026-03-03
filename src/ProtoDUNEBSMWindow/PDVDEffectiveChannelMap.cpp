@@ -1,4 +1,4 @@
-#include "triggeralgs/BSMWindow/PDVDEffectiveChannelMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/PDVDEffectiveChannelMap.hpp"
 
 namespace triggeralgs {
 

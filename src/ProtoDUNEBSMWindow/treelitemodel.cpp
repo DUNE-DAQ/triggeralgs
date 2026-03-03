@@ -1,4 +1,4 @@
-#include "triggeralgs/BSMWindow/treelitemodel.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/treelitemodel.hpp"
 
 namespace triggeralgs {
 

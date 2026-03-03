@@ -1,4 +1,4 @@
-#include "triggeralgs/BSMWindow/DetectorPlaneMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/DetectorPlaneMap.hpp"
 #include <stdexcept>
 
 namespace triggeralgs {

@@ -1,7 +1,7 @@
 #ifndef TRIGGERALGS_COMPILEDMODELINTERFACE_HPP_
 #define TRIGGERALGS_COMPILEDMODELINTERFACE_HPP_
 
-#include "triggeralgs/BSMWindow/treelitemodel.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/treelitemodel.hpp"
 #include <string>
 #include <fstream>
 #include <algorithm>

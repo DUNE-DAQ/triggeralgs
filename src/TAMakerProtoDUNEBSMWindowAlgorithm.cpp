@@ -1,15 +1,15 @@
 /**
- * @file TAMakerBSMWindowAlgorithm.cpp
+ * @file TAMakerProtoDUNEBSMWindowAlgorithm.cpp
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2021.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
 
-#include "triggeralgs/BSMWindow/TAMakerBSMWindowAlgorithm.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/TAMakerProtoDUNEBSMWindowAlgorithm.hpp"
 
 #include "TRACE/trace.h"
-#define TRACE_NAME "TAMakerBSMWindowAlgorithm"
+#define TRACE_NAME "TAMakerProtoDUNEBSMWindowAlgorithm"
 
 #include <vector>
 #include <chrono>
@@ -21,7 +21,7 @@ using Logging::TLVL_DEBUG_LOW;
 using Logging::TLVL_IMPORTANT;
 
 void
-TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
+TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
 {
   
   if(m_current_window.is_empty()){
@@ -90,7 +90,7 @@ TAMakerBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
 }
 
 void
-TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
+TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
 {
   if (config.is_object()){
     if (config.contains("channel_map_name")) m_channel_map_name = config["channel_map_name"];
@@ -145,12 +145,12 @@ TAMakerBSMWindowAlgorithm::configure(const nlohmann::json &config)
   }
 }
 
-TAMakerBSMWindowAlgorithm::~TAMakerBSMWindowAlgorithm() {
+TAMakerProtoDUNEBSMWindowAlgorithm::~TAMakerProtoDUNEBSMWindowAlgorithm() {
   // Nothing to clean up
 }
 
 TriggerActivity
-TAMakerBSMWindowAlgorithm::construct_ta() const
+TAMakerProtoDUNEBSMWindowAlgorithm::construct_ta() const
 {
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] I am constructing a trigger activity!";
 
@@ -174,7 +174,7 @@ TAMakerBSMWindowAlgorithm::construct_ta() const
   return ta;
 }
 
-bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
+bool TAMakerProtoDUNEBSMWindowAlgorithm::compute_treelite_classification() {
   
   m_last_pred_time = m_current_window.time_start;
   
@@ -196,4 +196,4 @@ bool TAMakerBSMWindowAlgorithm::compute_treelite_classification() {
 }
 
 // Register algo in TA Factory
-REGISTER_TRIGGER_ACTIVITY_MAKER(TRACE_NAME, TAMakerBSMWindowAlgorithm)
+REGISTER_TRIGGER_ACTIVITY_MAKER(TRACE_NAME, TAMakerProtoDUNEBSMWindowAlgorithm)
