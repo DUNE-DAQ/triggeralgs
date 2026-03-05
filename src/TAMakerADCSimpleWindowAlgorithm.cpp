@@ -30,7 +30,7 @@ TAMakerADCSimpleWindowAlgorithm::Window::add(TriggerPrimitive const &input_tp){
   // the TP list.
   adc_integral += input_tp.adc_integral;
   tp_list.push_back(input_tp);
-};
+}
 
 void 
 TAMakerADCSimpleWindowAlgorithm::Window::move(TriggerPrimitive const &input_tp, timestamp_t const &window_length){
@@ -40,22 +40,25 @@ TAMakerADCSimpleWindowAlgorithm::Window::move(TriggerPrimitive const &input_tp, 
   // Substract those TPs' contribution from the total window ADC.
   uint32_t n_tps_to_erase = 0;
   for(auto tp : tp_list){
-    if(!(input_tp.time_start-tp.time_start < window_length)){
+    if(input_tp.time_start-tp.time_start >= window_length){
       n_tps_to_erase++;
       adc_integral -= tp.adc_integral;
+    } else {
+      break;
     }
-    else break;
   }
   // Erase the TPs from the window.
   tp_list.erase(tp_list.begin(), tp_list.begin()+n_tps_to_erase);
+
   // Make the window start time the start time of what is now the
   // first TP.
-  if(tp_list.size()!=0){
+  if(!tp_list.empty()){
     time_start = tp_list.front().time_start;
     add(input_tp);
+  } else {
+    reset(input_tp);
   }
-  else reset(input_tp);
-};
+}
 
 
 void 
@@ -69,7 +72,7 @@ TAMakerADCSimpleWindowAlgorithm::Window::reset(TriggerPrimitive const &input_tp)
   adc_integral = input_tp.adc_integral;
   // Add the input TP to the TP list.
   tp_list.push_back(input_tp);
-};
+}
 
 
 
@@ -152,13 +155,14 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] I am constructing a trigger activity!";
   //TLOG_DEBUG(TRACE_NAME) << m_current_window;
 
-  const TriggerPrimitive& latest_tp_in_window = m_current_window.tp_list.back();
-  uint64_t ch_min{latest_tp_in_window.channel}, ch_max{latest_tp_in_window.channel};
-  uint64_t time_min{latest_tp_in_window.time_start}, time_max{latest_tp_in_window.time_start + latest_tp_in_window.samples_over_threshold * 32};
+  const TriggerPrimitive& last_tp = m_current_window.tp_list.back();
+  uint64_t ch_min{last_tp.channel}, ch_max{last_tp.channel};
+  uint64_t time_min{last_tp.time_start}, time_max{last_tp.time_start + last_tp.samples_over_threshold * 32};
 
-  uint64_t adc_peak{latest_tp_in_window.adc_peak};
-  uint64_t ch_peak{dunedaq::trgdataformats::INVALID_CHANNEL};
-  timestamp_t time_peak{dunedaq::trgdataformats::INVALID_TIMESTAMP};
+  uint64_t adc_peak{last_tp.adc_peak};
+  uint64_t ch_peak{last_tp.channel};
+  timestamp_t time_peak{last_tp.time_start + last_tp.samples_to_peak * 32};
+
 
   std::vector<TriggerPrimitive> tp_list;
   tp_list.reserve(m_current_window.tp_list.size());
@@ -175,7 +179,7 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
     if (tp.adc_peak > adc_peak) {
       adc_peak = tp.adc_peak;
       ch_peak = tp.channel;
-      time_peak = time_peak;
+      time_peak = tp.time_start + tp.samples_to_peak * 32;
     }
 
     tp_list.push_back(tp);
@@ -192,7 +196,7 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
   ta.channel_peak = ch_peak;
   ta.adc_integral = m_current_window.adc_integral;
   ta.adc_peak = adc_peak;
-  ta.detid = latest_tp_in_window.detid;
+  ta.detid = last_tp.detid;
   ta.type = TriggerActivity::Type::kTPC;
   ta.algorithm = TriggerActivity::Algorithm::kADCSimpleWindow;
   ta.inputs.swap(tp_list);
