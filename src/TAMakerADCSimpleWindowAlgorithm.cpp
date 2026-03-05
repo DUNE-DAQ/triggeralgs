@@ -157,11 +157,11 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
 
   const TriggerPrimitive& last_tp = m_current_window.tp_list.back();
   uint64_t ch_min{last_tp.channel}, ch_max{last_tp.channel};
-  uint64_t time_min{last_tp.time_start}, time_max{last_tp.time_start + last_tp.samples_over_threshold * 32};
+  uint64_t time_min{last_tp.time_start}, time_max{last_tp.time_start + last_tp.samples_over_threshold * k_sample_to_dts_ticks};
 
   uint64_t adc_peak{last_tp.adc_peak};
   uint64_t ch_peak{last_tp.channel};
-  timestamp_t time_peak{last_tp.time_start + last_tp.samples_to_peak * 32};
+  timestamp_t time_peak{last_tp.time_start + last_tp.samples_to_peak * k_sample_to_dts_ticks};
 
 
   std::vector<TriggerPrimitive> tp_list;
@@ -175,11 +175,11 @@ TAMakerADCSimpleWindowAlgorithm::construct_ta() const
     ch_min = std::min(ch_min, tp.channel);
     ch_max = std::max(ch_max, tp.channel);
     time_min = std::min(time_min, tp.time_start);
-    time_max = std::max(time_max, tp.time_start + tp.samples_over_threshold * 32);
+    time_max = std::max(time_max, tp.time_start + tp.samples_over_threshold * k_sample_to_dts_ticks); // FIXME: Replace the hard-coded SOT to TOT scaling.
     if (tp.adc_peak > adc_peak) {
       adc_peak = tp.adc_peak;
       ch_peak = tp.channel;
-      time_peak = tp.time_start + tp.samples_to_peak * 32;
+      time_peak = tp.time_start + tp.samples_to_peak * k_sample_to_dts_ticks; // FIXME: Replace the hard-coded STP to `time_peak` conversion.
     }
 
     tp_list.push_back(tp);

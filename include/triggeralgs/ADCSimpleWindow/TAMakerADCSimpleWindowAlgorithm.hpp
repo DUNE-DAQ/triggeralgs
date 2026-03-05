@@ -56,6 +56,10 @@ private:
   // Configurable parameters.
   uint32_t m_adc_threshold = 1200000;
   timestamp_t m_window_length = 100000;
+
+  // FIXME: should this be centrally defined?
+  // FIXME 2: assumes the same conversion for all TPC types,  which is not the case (TPCE/BDE = 32, TDE=32.5)
+  const k_sample_to_dts_ticks = 32; 
 };
 
 
