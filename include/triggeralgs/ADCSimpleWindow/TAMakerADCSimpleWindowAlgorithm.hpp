@@ -59,7 +59,7 @@ private:
 
   // FIXME: should this be centrally defined?
   // FIXME 2: assumes the same conversion for all TPC types,  which is not the case (TPCE/BDE = 32, TDE=32.5)
-  const k_sample_to_dts_ticks = 32; 
+  const uint16_t k_sample_to_dts_ticks = 32; 
 };
 
 
