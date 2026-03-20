@@ -62,6 +62,7 @@ add_library(triggeralgs SHARED
   src/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.cpp
   src/ProtoDUNEBSMWindow/treelitemodel.cpp
   src/ProtoDUNEBSMWindow/models/treelitePDHDmodel.cpp
+  src/ProtoDUNEBSMWindow/models/treelitePDVDmodel.cpp
   src/ProtoDUNEBSMWindow/CompiledModelInterface.cpp
   src/TAWindow.cpp
   src/TPWindow.cpp

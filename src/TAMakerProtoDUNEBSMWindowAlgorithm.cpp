@@ -61,12 +61,10 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
   }
   // If the addition of the current TP to the window would make it longer
   // than the specified window length, don't add it
-  // Instead go through a series of filters and eventually a XGBoost model to determine whether to create a TA
+  // Instead check whether it has been long enough since the last XGBoost prediction 
+  // then run the model to determine whether to create a TA
   else if (
       (m_current_window.time_start - m_last_pred_time) > m_bin_length && // check enough time has passed since last window
-      m_current_window.tp_list.size() > 20 && // need enough TPs in window to bother
-      m_current_window.adc_integral > m_adc_threshold && // set a low minimum threshold for the ADC integral sum
-      (m_current_window.mean_adc_peak() / m_current_window.mean_tot()) > m_ratio_threshold && // mean peak / tot cut
       compute_treelite_classification() // XGBoost classifier 
       )
   {
@@ -96,10 +94,6 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
     if (config.contains("channel_map_name")) m_channel_map_name = config["channel_map_name"];
     if (config.contains("num_time_bins")) m_num_timebins = config["num_time_bins"];
     if (config.contains("adc_threshold")) m_adc_threshold = config["adc_threshold"];
-    if (config.contains("ratio_threshold")) {
-      m_ratio_threshold = config["ratio_threshold"];
-      m_ratio_threshold *= 0.01;
-    }
     if (config.contains("window_length")) {
       m_window_length = config["window_length"];
       m_bin_length = static_cast<timestamp_t>(m_window_length / m_num_timebins);
@@ -179,9 +173,9 @@ bool TAMakerProtoDUNEBSMWindowAlgorithm::compute_treelite_classification() {
   m_last_pred_time = m_current_window.time_start;
   
   m_current_window.bin_window(
-      flat_batched_inputs, m_bin_length, 
-      m_chan_bin_length, m_num_timebins, 
-      m_num_chanbins, m_first_channel, 
+      flat_batched_inputs, 
+      m_num_timebins, m_bin_length,
+      m_num_chanbins, m_chan_bin_length, m_first_channel,
       m_pdvd_eff_channel_mapper, m_pdvd_map
       );
   

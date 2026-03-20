@@ -63,11 +63,12 @@ void ProtoDUNEBSMWindow::reset(TriggerPrimitive const &input_tp){
 };
 
 void ProtoDUNEBSMWindow::bin_window(
-    std::vector<float> &input, timestamp_t time_bin_width, 
-    channel_t chan_bin_width, int num_time_bins, 
-    int num_chan_bins, channel_t first_channel,
-    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper, 
+    std::vector<float> &input, 
+    int num_time_bins, timestamp_t time_bin_width,
+    int num_chan_bins, channel_t chan_bin_width, channel_t first_channel,
+    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper,
     bool use_pdvd_map) {
+
   std::fill(input.begin(), input.end(), 0.0f);
 
   const float inv_time_bin_width = 1.0f / time_bin_width;

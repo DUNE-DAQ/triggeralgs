@@ -53,18 +53,17 @@ private:
 
   // Configurable parameters.
   uint32_t m_adc_threshold = 200000;
-  float m_ratio_threshold = 0.65;
   float m_bdt_threshold = 0.99;
   timestamp_t m_window_length = 20000;
   std::string m_channel_map_name = "PD2VDTPCChannelMap";
   // End of configurable parameters
 
   // Define time binning
-  timestamp_t m_bin_length = 4000;
-  int m_num_timebins = 5;
+  timestamp_t m_bin_length = 2000;
+  int m_num_timebins = 10;
   // Define channel binning
   channel_t m_chan_bin_length = 100;
-  int m_num_chanbins = 5;
+  int m_num_chanbins = 10;
 
   // Geometry information for binning
   std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap; 
