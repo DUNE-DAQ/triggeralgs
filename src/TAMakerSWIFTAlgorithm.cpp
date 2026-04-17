@@ -13,37 +13,21 @@ namespace triggeralgs {
   void TriggerActivityMakerSWIFT::configure(const nlohmann::json& config)
   {
     //window settings
-    if (config.contains("window_length"))
-      m_window_length = config["window_length"];
-
-    if (config.contains("inspect_energy_threshold"))
-      m_inspect_energy_threshold = config["inspect_energy_threshold"];
-
-    if (config.contains("accept_energy_threshold"))
-      m_accept_energy_threshold = config["accept_energy_threshold"];
+    m_window_length                 = config.value("window_length", 32000); // in DTS ticks (32 * 1000 readout ticks @ 500ns/tick)
+    m_inspect_energy_threshold_sadc = config.value("inspect_energy_threshold_sadc", 15000);
+    m_accept_energy_threshold_sadc  = config.value("accept_energy_threshold_sadc", 55000);
 
     //tp filtering settings
-    if (config.contains("min_adc_peak"))
-      m_min_adc_peak = config["min_adc_peak"];
-
-    if (config.contains("min_samples_over_threshold"))
-      m_min_samples_over_threshold = config["min_samples_over_threshold"];
+    m_min_adc_peak               = config.value("min_adc_peak", 80); //ADC
+    m_min_samples_over_threshold = config.value("min_samples_over_threshold", 256); // 8 * 32 DTS ticks while still using TPv1 FIXME
 
     //clustering
-    if (config.contains("cm_per_tick"))
-      m_cm_per_tick = config["cm_per_tick"];
-
-    if (config.contains("wire_pitch"))
-      m_wire_pitch = config["wire_pitch"];
-
-    if (config.contains("min_samples"))
-      m_db_min_samples = config["min_samples"];
-
-    if (config.contains("epsilon")) // NN search radius
-      m_db_eps = config["epsilon"];
-
-    if (config.contains("cluster_energy_cut"))
-      m_cluster_energy_cut = config["cluster_energy_cut"];
+    //these depend on detector properties. default values for HD
+    m_cm_per_tick              = config.value("cm_per_tick", 0.016 * 0.16); // sampling rate [us/tick] * drift velocity [cm/us]
+    m_wire_pitch               = config.value("wire_pitch", 0.48); // cm
+    m_db_min_samples           = config.value("min_samples", 2); //min. number of TPs for valid cluster
+    m_db_eps                   = config.value("epsilon", 2); //dbscan search radius in cm
+    m_cluster_energy_cut_sadc  = config.value("cluster_energy_cut_sadc", 22000); // min energy of dominant cluster eng. in window for acceptance
 
     assert(m_window_length > 0);
   }
@@ -58,10 +42,10 @@ namespace triggeralgs {
 
   // Reset window state
   void TriggerActivityMakerSWIFT::reset_window_state(uint64_t new_window_start) {
-    m_window_start  = new_window_start;
-    m_window_energy = 0;
-    m_tp_count      = 0;
-    m_current_ta    = TriggerActivity(); //.inputs.clear();  // reuse existing TA heap allocation
+    m_window_start          = new_window_start;
+    m_window_energy_sadc    = 0;
+    m_tp_count              = 0;
+    m_current_ta            = TriggerActivity(); 
     m_current_ta.time_start = m_window_start;
   }
 
@@ -89,12 +73,12 @@ namespace triggeralgs {
       m_initialised = true;
     }
 
-    //if TP is tardy and belongs to past window - reject it for now
+    //if TP belongs to past window (already closed), reject it (not ideal)
     if (tp_window_start < m_window_start){
       return;
     }
 
-    //if TP belongs to future window, close current and jump ahead
+    //if TP belongs to future window, close existing TA and start a new one at current time
     if (tp_window_start > m_window_start){
       close_window(output_tas);
       reset_window_state(tp_window_start);
@@ -102,7 +86,7 @@ namespace triggeralgs {
 
     //If we got here, the TP belongs to the current window
     m_current_ta.inputs.push_back(input_tp);
-    m_window_energy += input_tp.adc_integral;
+    m_window_energy_sadc += input_tp.adc_integral;
     ++m_tp_count;
   }
 
@@ -114,15 +98,14 @@ namespace triggeralgs {
 
     //Prompt window categorisatoin : immidiate accept, inspect, reject based on local energy in window
     WindowDecision decision;
-    if (m_window_energy >= m_accept_energy_threshold) decision = WindowDecision::Accept;
-    else if (m_window_energy >= m_inspect_energy_threshold) decision = WindowDecision::Inspect;
+    if (m_window_energy_sadc >= m_accept_energy_threshold_sadc) decision = WindowDecision::kAccept;
+    else if (m_window_energy_sadc >= m_inspect_energy_threshold_sadc) decision = WindowDecision::kInspect;
     else  return; // Reject
 
     // cluster inspect cases
-    if (decision == WindowDecision::Inspect) {
+    if (decision == WindowDecision::kInspect) {
       const uint64_t max_cluster_energy =  extract_dominant_cluster_energy(m_current_ta.inputs, m_db_eps, m_db_min_samples);
-      if (max_cluster_energy <= m_cluster_energy_cut) return; // reject window if it didn't pass inspection
-    //for the time being, not updating the flag to keep track of what  went through the inspect-->accept pipeline. FIXME?
+      if (max_cluster_energy <= m_cluster_energy_cut_sadc) return; // reject window if it didn't pass inspection
     }
 
     // Emit TA: should only reach this step if dealing with  Accept, or Inspect windows that passed clustering
@@ -221,12 +204,12 @@ namespace triggeralgs {
   {
     m_current_ta.time_start = m_window_start;
     m_current_ta.time_end   = m_window_start + m_window_length;
-    m_current_ta.adc_integral = m_window_energy;
+    m_current_ta.adc_integral = m_window_energy_sadc;
 
     const TriggerPrimitive& first_tp = m_current_ta.inputs.front();
     m_current_ta.detid = first_tp.detid;
     m_current_ta.type = TriggerActivity::Type::kTPC;
-    m_current_ta.algorithm = TriggerActivity::Algorithm::kUnknown;
+    m_current_ta.algorithm = TriggerActivity::Algorithm::kUnknown; //FIXME
 
 
     dunedaq::trgdataformats::channel_t min_ch = first_tp.channel;
