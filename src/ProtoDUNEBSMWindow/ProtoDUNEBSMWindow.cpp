@@ -15,8 +15,8 @@ void ProtoDUNEBSMWindow::add(TriggerPrimitive const &input_tp){
   // the TP list. Also keep running sum of all the samples over threshold
   // and the peak ADC. These are used for samples/peak ratio cut
   adc_integral += input_tp.adc_integral;
-  adc_peak_sum += input_tp.adc_peak;
-  tot_sum += input_tp.samples_over_threshold;
+  //adc_peak_sum += input_tp.adc_peak;
+  //tot_sum += input_tp.samples_over_threshold;
   tp_list.push_back(input_tp);
 };
 
@@ -34,8 +34,8 @@ void ProtoDUNEBSMWindow::move(TriggerPrimitive const &input_tp, timestamp_t cons
     if(!(input_tp.time_start-tp.time_start < window_length)){
       n_tps_to_erase++;
       adc_integral -= tp.adc_integral;
-      adc_peak_sum -= tp.adc_peak;
-      tot_sum -= tp.samples_over_threshold;
+      //adc_peak_sum -= tp.adc_peak;
+      //tot_sum -= tp.samples_over_threshold;
     }
     else break;
   }
@@ -43,7 +43,7 @@ void ProtoDUNEBSMWindow::move(TriggerPrimitive const &input_tp, timestamp_t cons
   tp_list.erase(tp_list.begin(), tp_list.begin()+n_tps_to_erase);
   // Make the window start time the start time of what is now the
   // first TP.
-  if(tp_list.size()!=0){
+  if(!tp_list.empty()){
     time_start = tp_list.front().time_start;
     add(input_tp);
   }
@@ -99,12 +99,12 @@ void ProtoDUNEBSMWindow::fill_entry_window(std::vector<Entry> &entry_input, std:
 float ProtoDUNEBSMWindow::mean_sadc() {
   return static_cast<float>(adc_integral / tp_list.size());;
 }
-float ProtoDUNEBSMWindow::mean_adc_peak() {
-  return static_cast<float>(adc_peak_sum / tp_list.size());
-}
-float ProtoDUNEBSMWindow::mean_tot() {
-  return static_cast<float>(tot_sum / tp_list.size());
-}
+//float ProtoDUNEBSMWindow::mean_adc_peak() {
+//  return static_cast<float>(adc_peak_sum / tp_list.size());
+//}
+//float ProtoDUNEBSMWindow::mean_tot() {
+//  return static_cast<float>(tot_sum / tp_list.size());
+//}
 
 std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window){
   if(window.is_empty()) os << "Window is empty!\n";
