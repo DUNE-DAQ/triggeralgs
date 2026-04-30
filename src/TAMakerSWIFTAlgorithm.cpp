@@ -209,7 +209,7 @@ namespace triggeralgs {
     const TriggerPrimitive& first_tp = m_current_ta.inputs.front();
     m_current_ta.detid = first_tp.detid;
     m_current_ta.type = TriggerActivity::Type::kTPC;
-    m_current_ta.algorithm = TriggerActivity::Algorithm::kUnknown; //FIXME
+    m_current_ta.algorithm = TriggerActivity::Algorithm::kSWIFT; 
 
 
     dunedaq::trgdataformats::channel_t min_ch = first_tp.channel;
