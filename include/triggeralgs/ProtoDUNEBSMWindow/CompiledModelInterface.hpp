@@ -17,7 +17,7 @@ class TreeliteModelBase;
 class CompiledModelInterface {
   public:
 
-    CompiledModelInterface(int nbatch);
+    CompiledModelInterface(int nbatch, bool is_pdvd);
 
     ~CompiledModelInterface();
 

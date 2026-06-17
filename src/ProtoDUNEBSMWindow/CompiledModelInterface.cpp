@@ -4,8 +4,12 @@
 
 namespace triggeralgs {
 
-CompiledModelInterface::CompiledModelInterface(int nbatch) : num_batch(nbatch) {
-  model_ptr = std::make_unique<TreelitePDHDModel>();
+CompiledModelInterface::CompiledModelInterface(int nbatch, bool is_pdvd) : num_batch(nbatch) {
+  if (is_pdvd) {  
+    model_ptr = std::make_unique<TreelitePDVDModel>();
+  } else {
+    model_ptr = std::make_unique<TreelitePDHDModel>();
+  }
 }
 
 CompiledModelInterface::~CompiledModelInterface() {}
