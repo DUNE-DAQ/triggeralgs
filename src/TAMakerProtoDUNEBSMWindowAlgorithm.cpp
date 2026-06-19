@@ -157,8 +157,6 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
 
   flat_batched_inputs.resize(num_feature);
 
-  m_num_chanbins = num_feature / m_num_timebins;
-
   flat_batched_Entries.clear();
   for (size_t i = 0; i < num_feature; ++i) {
     union Entry zero;

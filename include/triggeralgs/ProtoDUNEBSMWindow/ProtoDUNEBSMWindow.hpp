@@ -44,8 +44,6 @@ class ProtoDUNEBSMWindow {
 
     timestamp_t time_start;
     uint32_t adc_integral;
-    //uint64_t adc_peak_sum;
-    //uint64_t tot_sum;
     std::vector<TriggerPrimitive> tp_list;
   };
 }

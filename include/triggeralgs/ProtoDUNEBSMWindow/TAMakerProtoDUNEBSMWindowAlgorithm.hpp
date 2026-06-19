@@ -61,9 +61,11 @@ private:
 
   // Define time binning
   timestamp_t m_bin_length = 2000;
+  // Number of bins fixed by model training
   const int m_num_timebins = 10;
   // Define channel binning
   channel_t m_chan_bin_length = 50;
+  // Number of bins fixed by model training
   const int m_num_chanbins = 10;
 
   // Geometry information for binning
