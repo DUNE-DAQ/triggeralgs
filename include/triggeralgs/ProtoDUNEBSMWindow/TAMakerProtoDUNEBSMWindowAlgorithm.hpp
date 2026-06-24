@@ -52,12 +52,17 @@ private:
   std::vector<Entry> flat_batched_Entries;
 
   // Configurable parameters.
-  uint32_t m_adc_threshold_collection = 200000;
   uint32_t m_adc_threshold_induction = 12000000;
   float m_bdt_threshold = 0.99;
-  const timestamp_t m_window_length = 20000;
   std::string m_channel_map_name = "PD2VDTPCChannelMap";
   // End of configurable parameters
+  
+  // Constant parameters defined by XGBoost model training
+  // Currently both PD-HD and PD-VD XGBoost models have been trained
+  // on data filtered to have an ADC sum > 200k ADC
+  const uint32_t m_adc_threshold_collection = 200000;
+  const timestamp_t m_window_length = 20000;
+  // End constant parameters
 
   // Define time binning
   timestamp_t m_bin_length = 2000;

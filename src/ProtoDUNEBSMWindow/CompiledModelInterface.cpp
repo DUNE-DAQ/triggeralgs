@@ -18,16 +18,6 @@ int CompiledModelInterface::GetNumFeatures() {
   return model_ptr->get_num_feature();
 }
 
-void CompiledModelInterface::ModelWarmUp(Entry *input) {
-  // Warm the BDT up here
-  float result[num_batch];
-  for (int rid = 0; rid < num_batch; ++rid) {
-    for (int i = 0; i < 100; i++) {
-      model_ptr->predict(input, 0, result);
-    }
-  }
-}
-
 void CompiledModelInterface::Predict(Entry *input, float *result) {
   for (int rid = 0; rid < num_batch; ++rid) {
     model_ptr->predict(input, 0, result);

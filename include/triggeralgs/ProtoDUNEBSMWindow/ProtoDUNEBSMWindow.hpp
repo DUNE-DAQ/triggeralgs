@@ -35,11 +35,6 @@ class ProtoDUNEBSMWindow {
 
     void fill_entry_window(std::vector<Entry> &entry_input, std::vector<float> &input);
 
-    // Calculate average properties of TPs in a time window
-    float mean_sadc();
-    float mean_adc_peak();
-    float mean_tot();
-
     friend std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window);
 
     timestamp_t time_start;

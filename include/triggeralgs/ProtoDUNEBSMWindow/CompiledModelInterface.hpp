@@ -24,8 +24,6 @@ class CompiledModelInterface {
     // Get number of features in model 
     int GetNumFeatures();
 
-    void ModelWarmUp(Entry *input);
-
     // Run prediction with GBDT
     void Predict(Entry *input, float *result);
 

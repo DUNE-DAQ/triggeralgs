@@ -58,14 +58,13 @@ namespace triggeralgs {
     void predict(union Entry* data, int pred_margin, float* result) const override;
   };
   
+  /// Model for signal finding in PD-VD — trained on PD-VD data
   class TreelitePDVDModel : public TreeliteModelBase {
   public:
     using TreeliteModelBase::TreeliteModelBase;
     virtual int32_t get_num_feature() const override;
     void predict(union Entry* data, int pred_margin, float* result) const override;
   };
-
-  // Add model later for PD-VD signal findings
 
 } // namespace triggeralgs
 #endif // TRIGGERALGS_TREELITEMODEL_HPP_

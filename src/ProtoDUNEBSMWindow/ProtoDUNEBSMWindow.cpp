@@ -11,9 +11,8 @@ bool ProtoDUNEBSMWindow::is_empty() const{
 };
 
 void ProtoDUNEBSMWindow::add(TriggerPrimitive const &input_tp){
-  // Add the input TP's contribution to the total ADC and add it to
-  // the TP list. Also keep running sum of all the samples over threshold
-  // and the peak ADC. These are used for samples/peak ratio cut
+  // Add the input TP's contribution to the total 
+  // ADC and add it to the TP list.
   adc_integral += input_tp.adc_integral;
   tp_list.push_back(input_tp);
 };
@@ -90,10 +89,6 @@ void ProtoDUNEBSMWindow::fill_entry_window(std::vector<Entry> &entry_input, std:
   for (size_t i = 0; i < input.size(); i++) {
     entry_input[i].fvalue = input[i];
   }
-}
-
-float ProtoDUNEBSMWindow::mean_sadc() {
-  return static_cast<float>(adc_integral / tp_list.size());;
 }
 
 std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window){

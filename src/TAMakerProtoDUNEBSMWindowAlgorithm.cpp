@@ -53,14 +53,12 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
       m_pdvd_eff_channel_mapper = std::make_unique<PDVDEffectiveChannelMap>(plane_info.min_channel, plane_info.n_channels);
 
       m_first_channel = m_pdvd_eff_channel_mapper->remapCollectionPlaneChannel(m_first_channel);
-      m_last_channel = m_first_channel + m_pdvd_eff_channel_mapper->getNEffectiveChannels();
       m_chan_bin_length = m_pdvd_eff_channel_mapper->getNEffectiveChannels() / m_num_chanbins;
     } else { // Running in PD-HD, so don't need effective channel
-      m_last_channel = m_first_channel + n_channels_on_plane;
       m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
     }
 
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", N channels on plane = " << n_channels_on_plane << std::endl
       << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length;
     return;
   } 
@@ -77,9 +75,9 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
   // First, if these are not collection plane TPs, just evaluate the total charge
   // If the total charge on the induction plane crosses a threshold, create a TA
   else if(!m_collection_plane && m_current_window.adc_integral > m_adc_threshold_induction){
-    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:ADCSW] ADC integral in window is greater than specified threshold.";
+    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] ADC integral in window is greater than specified threshold.";
     output_ta.push_back(construct_ta());
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:ADCSW] Resetting window with input_tp.";                           
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Resetting window with input_tp.";                           
     m_current_window.reset(input_tp);
   }
 
@@ -101,7 +99,7 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
   }
   // If it is not, move the window along.
   else{
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Window is at required length but adc threshold not met, shifting window along.";
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Window is at required length but adc/bdt threshold not met, shifting window along.";
     m_current_window.move(input_tp, m_window_length);
   }
   
@@ -119,20 +117,15 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
   if (config.is_object()){
     if (config.contains("channel_map_name")) m_channel_map_name = config["channel_map_name"];
     if (config.contains("adc_threshold_induction")) m_adc_threshold_induction = config["adc_threshold_induction"];
-    if (config.contains("bdt_threshold")) {
-      uint64_t int_bdt_threshold = config["bdt_threshold"];
-      if (int_bdt_threshold <= 100) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.01);
-      else if (int_bdt_threshold <= 1000) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.001);
-      else if (int_bdt_threshold <= 10000) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.0001);
-      else m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.01);
-    }
+    if (config.contains("bdt_threshold")) m_bdt_threshold = config["bdt_threshold"];
   }
   else{
-    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:BSMW] The DEFAULT values of window_length and adc_threshold are being used.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:BSMW] Use DEFAULT values of channel_map_name, adc_threshold_induction and bdt_threshold.";
   }
   
-  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Bin length is " << m_bin_length << " for a window of " << m_num_timebins << 
-    " bins. ADC threshold across window set to " << m_adc_threshold_induction;
+  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Channel map name is " << m_channel_map_name <<
+    ". ADC threshold for the induction planes set to " << m_adc_threshold_induction << 
+    ". BDT threshold for collection plane set to " << m_bdt_threshold;
   
   channelMap = dunedaq::detchannelmaps::make_tpc_map(m_channel_map_name);
 
@@ -143,11 +136,6 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
   } else { // else we are in PD-HD and we use true channel mapping
     m_pdvd_map = false;
   }
- 
-  // Collection plane ADC threshold fixed by model training
-  // Account for PD-HD and PD-VD having different thresholds (for now they are the same)
-  if (m_pdvd_map) m_adc_threshold_collection = 200000.;
-  else m_adc_threshold_collection = 200000.;
 
   m_bin_length = static_cast<timestamp_t>(m_window_length / m_num_timebins);
 
