@@ -20,6 +20,11 @@ ERS_DECLARE_ISSUE(triggeralgs,
                   ((std::string)alg_name))
 
 ERS_DECLARE_ISSUE(triggeralgs,
+                  FactoryInvalidState,
+                  "Makers map contains invalid/null pointers " << alg_name,
+                  ((std::string)alg_name))
+
+ERS_DECLARE_ISSUE(triggeralgs,
                   FactoryNotFound,
                   "Factory couldn't find: " << alg_name,
                   ((std::string)alg_name))

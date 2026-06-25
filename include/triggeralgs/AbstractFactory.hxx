@@ -25,6 +25,14 @@ template <typename T>
 void AbstractFactory<T>::register_creator(const std::string alg_name, maker_creator creator)
 {
   creation_map& makers = get_makers();
+  
+  // Check invalid state in the map
+  for (const auto& pair : makers) {
+    if (!pair.second) {  // nullptr or invalid
+      throw FactoryInvalidState(ERS_HERE, alg_name);
+    }
+  }
+
   auto it = makers.find(alg_name);
 
   if (it == makers.end()) {
