@@ -53,7 +53,7 @@ private:
 
   // Configurable parameters.
   uint32_t m_adc_threshold_induction = 12000000;
-  float m_bdt_threshold = 0.99;
+  float m_bdt_threshold = 0.999;
   std::string m_channel_map_name = "PD2VDTPCChannelMap";
   // End of configurable parameters
   
@@ -89,7 +89,6 @@ private:
   bool m_collection_plane = false;
   // first and last channel on the plane
   channel_t m_first_channel;
-  channel_t m_last_channel;
 
   // Compiled treelite model interface
   std::unique_ptr<CompiledModelInterface> m_compiled_model_interface;
