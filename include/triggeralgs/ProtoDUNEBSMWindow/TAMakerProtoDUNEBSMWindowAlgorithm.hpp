@@ -28,7 +28,7 @@ public:
   void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta); 
   void configure(const nlohmann::json &config);
 
-  ~TAMakerProtoDUNEBSMWindowAlgorithm() override;
+  ~TAMakerProtoDUNEBSMWindowAlgorithm() override = default;
 
 private:
   // Function to handle XGBoost classification
@@ -40,7 +40,7 @@ private:
   // The current time window of TPs
   ProtoDUNEBSMWindow m_current_window;
 
-  timestamp_t m_last_pred_time;
+  timestamp_t m_last_pred_time = 0;
   uint64_t m_primitive_count = 0;
 
   // Possible to do batch predictions with XGBoost
@@ -68,8 +68,6 @@ private:
   timestamp_t m_bin_length = 2000;
   // Number of bins fixed by model training
   const int m_num_timebins = 10;
-  // Define channel binning
-  channel_t m_chan_bin_length = 50;
   // Number of bins fixed by model training
   const int m_num_chanbins = 10;
 
@@ -89,6 +87,8 @@ private:
   bool m_collection_plane = false;
   // first and last channel on the plane
   channel_t m_first_channel;
+  // Number of channels on the plane (will be no. effective channels for PD-VD)
+  channel_t m_n_channels_on_plane;
 
   // Compiled treelite model interface
   std::unique_ptr<CompiledModelInterface> m_compiled_model_interface;

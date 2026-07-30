@@ -44,22 +44,19 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
     // Use PlaneInfo object to get the first and last channels on plane
     PlaneInfo plane_info = m_det_plane_map.get_plane_info(m_channel_map_name, detelement, plane);
     m_first_channel = static_cast<channel_t>(plane_info.min_channel);
-    channel_t n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
+    m_n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
 
     // If we are in PD-VD use 'effective' channel mapping for CRPs
     // (but only for collection plane)
-    if (plane != 2) m_pdvd_map = false;
-    if (m_pdvd_map) {
+    if (m_pdvd_map && m_collection_plane) {
       m_pdvd_eff_channel_mapper = std::make_unique<PDVDEffectiveChannelMap>(plane_info.min_channel, plane_info.n_channels);
-
+      // Get the first effective channel and number of effective channels on the plane
       m_first_channel = m_pdvd_eff_channel_mapper->remapCollectionPlaneChannel(m_first_channel);
-      m_chan_bin_length = m_pdvd_eff_channel_mapper->getNEffectiveChannels() / m_num_chanbins;
-    } else { // Running in PD-HD, so don't need effective channel
-      m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
+      m_n_channels_on_plane = m_pdvd_eff_channel_mapper->getNEffectiveChannels();
     }
 
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", N channels on plane = " << n_channels_on_plane << std::endl
-      << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length;
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", N channels on plane = " << m_n_channels_on_plane << std::endl
+      << "Number of channel bins = " << m_num_chanbins;
     return;
   } 
   
@@ -87,10 +84,10 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
   // Instead check whether it has been long enough since the last XGBoost prediction 
   // then run the model to determine whether to create a TA
   else if (m_collection_plane &&
-      (m_current_window.time_start - m_last_pred_time) > m_bin_length && // check enough time has passed since last window
-      m_current_window.adc_integral > m_adc_threshold_collection && // set a low minimum threshold for the ADC integral sum
-      compute_treelite_classification() // XGBoost classifier 
-      )
+           (m_current_window.time_start - m_last_pred_time) > m_bin_length && // check enough time has passed since last window
+           m_current_window.adc_integral > m_adc_threshold_collection && // set a low minimum threshold for the ADC integral sum
+           compute_treelite_classification() // XGBoost classifier 
+          )
   {
     TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] XGBoost neutrino prob. is greater than specified threshold.";
     output_ta.push_back(construct_ta());
@@ -153,10 +150,6 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
   }
 }
 
-TAMakerProtoDUNEBSMWindowAlgorithm::~TAMakerProtoDUNEBSMWindowAlgorithm() {
-  // Nothing to clean up
-}
-
 TriggerActivity
 TAMakerProtoDUNEBSMWindowAlgorithm::construct_ta() const
 {
@@ -189,7 +182,7 @@ bool TAMakerProtoDUNEBSMWindowAlgorithm::compute_treelite_classification() {
   m_current_window.bin_window(
       flat_batched_inputs, 
       m_num_timebins, m_bin_length,
-      m_num_chanbins, m_chan_bin_length, m_first_channel,
+      m_num_chanbins, m_n_channels_on_plane, m_first_channel,
       m_pdvd_eff_channel_mapper, m_pdvd_map
       );
   

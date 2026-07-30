@@ -29,7 +29,7 @@ class ProtoDUNEBSMWindow {
     // If running in PD-VD then effective channel ID is used
     void bin_window(std::vector<float> &input, 
                     int num_time_bins, timestamp_t time_bin_width,
-                    int num_chan_bins, channel_t chan_bin_width, channel_t first_channel,
+                    int num_chan_bins, channel_t n_channels_on_plane, channel_t first_channel,
                     std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper,
                     bool use_pdvd_map);
 

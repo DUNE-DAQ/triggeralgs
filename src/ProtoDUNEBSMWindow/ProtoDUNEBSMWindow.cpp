@@ -60,14 +60,13 @@ void ProtoDUNEBSMWindow::reset(TriggerPrimitive const &input_tp){
 void ProtoDUNEBSMWindow::bin_window(
     std::vector<float> &input, 
     int num_time_bins, timestamp_t time_bin_width,
-    int num_chan_bins, channel_t chan_bin_width, channel_t first_channel,
+    int num_chan_bins, channel_t n_channels_on_plane, channel_t first_channel,
     std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper,
     bool use_pdvd_map) {
 
   std::fill(input.begin(), input.end(), 0.0f);
 
   const float inv_time_bin_width = 1.0f / time_bin_width;
-  const float inv_chan_bin_width = 1.0f / chan_bin_width;
 
   for (const TriggerPrimitive& tp : tp_list) {
     channel_t temp_tp_channel = tp.channel;
@@ -76,7 +75,9 @@ void ProtoDUNEBSMWindow::bin_window(
       temp_tp_channel = effective_channel_mapper->remapCollectionPlaneChannel(temp_tp_channel);
     }
     size_t time_bin = static_cast<size_t>((tp.time_start - time_start) * inv_time_bin_width);
-    size_t channel_bin = static_cast<size_t>((temp_tp_channel - first_channel) * inv_chan_bin_width);
+    // Channel bin calculation matches model training - remainder channels are appended to 10th channel bin 
+    size_t channel_bin = static_cast<size_t>(((temp_tp_channel - first_channel) * num_chan_bins) / n_channels_on_plane);
+
     if (time_bin < num_time_bins && channel_bin < num_chan_bins) {
       size_t index = channel_bin * num_time_bins + time_bin;
       input[index] += tp.adc_integral;

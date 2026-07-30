@@ -28,7 +28,7 @@ class CompiledModelInterface {
     void Predict(Entry *input, float *result);
 
     // Is it a neutrino or cosmic according to GBDT?
-    bool Classify(const float *result, float &bdt_threshold);
+    bool Classify(const float *result, float bdt_threshold);
 
   protected:
     

@@ -24,7 +24,7 @@ void CompiledModelInterface::Predict(Entry *input, float *result) {
   }
 }
 
-bool CompiledModelInterface::Classify(const float *result, float &bdt_threshold) {
+bool CompiledModelInterface::Classify(const float *result, float bdt_threshold) {
   for (uint64_t rid = 0; rid < num_batch; rid++) {
     if (result[rid] > bdt_threshold) {
       return true;
