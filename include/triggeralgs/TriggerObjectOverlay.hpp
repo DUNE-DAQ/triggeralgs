@@ -55,10 +55,7 @@ write_overlay(const Object& object, void* buffer)
 {
   Overlay* overlay = reinterpret_cast<Overlay*>(buffer);
   overlay->data = static_cast<Data>(object);
-  overlay->n_inputs = object.inputs.size();
-  for (size_t i = 0; i < object.inputs.size(); ++i) {
-    overlay->inputs[i] = object.inputs[i];
-  }
+  overlay->set_inputs(object.inputs);
 }
 
 // Calculate the size of buffer (in bytes) required to store an
