@@ -158,3 +158,59 @@ contains a readout request (i.e. you MUST trigger), based on all the candidates 
 | `algorithm`      | `uint32_t`                      | some flag that says which algorithm created it (although I think there will only ever be one of this) |
 | `version`        | `uint16_t`                      | version of above                                                                                      |
 | `tc_list`        | `std::vector<TriggerCandidate>` | the list of TCs that was used to create it                                                            |
+
+You'll notice from looking at the code that the metadata components of
+`TriggerPrimitive`, `TriggerActivity` and `TriggerCandidate` (time,
+etc.) are all taken from structs in the `trgdataformats`
+package. There's a close relationship between this package and
+`trgdataformats`, which you'll see more of below.
+
+### Converting to and from overlays
+
+For serialization purposes, `trgdataformats` contains overlay classes
+for trigger primitives, trigger activity and trigger candidate
+objects, and `triggeralgs` provides tools to convert between their
+`triggeralgs` representation to/from those overlay classes.
+
+To convert a TA or TC into its corresponding overlay class and write
+it into a buffer, first find the required buffer size using
+`get_overlay_nbytes()`, passing the `TriggerActivity` or
+`TriggerCandidate` as an argument. With a buffer of the correct size,
+the overlay class can be written using `write_overlay(object,
+buffer)`. To read the overlay object from the buffer, you use
+`reinterpret_cast`. A simple example application:
+
+```c++
+
+#include "triggeralgs/TriggerCandidate.hpp"
+#include "triggeralgs/TriggerObjectOverlay.hpp"
+
+#include "trgdataformats/TriggerObjectOverlay.hpp"
+
+#include <cstddef>
+#include <vector>
+
+int main() {
+
+  triggeralgs::TriggerCandidate candidate;
+
+  // ...Set fields to some values...
+
+  // Find the required buffer size
+  size_t nbytes = triggeralgs::get_overlay_nbytes(candidate);
+
+  // Create a buffer of the appropriate size
+  std::vector<std::byte> buffervec(nbytes);
+  
+  // Write the `candidate` object as trgdataformats' TriggerCandidate into `buffer`
+  triggeralgs::write_overlay(candidate, buffervec.data());
+
+  // Can recover the trgdataformats' TriggerCandidate from the buffer
+  const dunedaq::trgdataformats::TriggerCandidate& candidate_overlay =
+    *reinterpret_cast<const dunedaq::trgdataformats::TriggerCandidate*>(buffervec.data());
+
+  // Can convert back to triggeralgs::TriggerCandidate
+  triggeralgs::TriggerCandidate candidate_read = triggeralgs::read_overlay_from_buffer<triggeralgs::TriggerCandidate>(buffervec.data());
+
+}
+```
