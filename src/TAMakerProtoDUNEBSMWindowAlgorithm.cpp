@@ -170,7 +170,7 @@ TAMakerProtoDUNEBSMWindowAlgorithm::construct_ta() const
   ta.adc_peak = latest_tp_in_window.adc_peak;
   ta.detid = latest_tp_in_window.detid;
   ta.type = TriggerActivity::Type::kTPC;
-  ta.algorithm = TriggerActivity::Algorithm::kUnknown;
+  ta.algorithm = TriggerActivity::Algorithm::kProtoDUNEBSMWindow;
   ta.inputs = m_current_window.tp_list;
   return ta;
 }
