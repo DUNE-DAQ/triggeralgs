@@ -27,23 +27,18 @@ class ProtoDUNEBSMWindow {
 
     // Bins the TPs as a function of channel and time
     // If running in PD-VD then effective channel ID is used
-    void bin_window(std::vector<float> &input, timestamp_t time_bin_width, channel_t chan_bin_width, 
-                    int num_time_bins, int num_chan_bins, channel_t first_channel,
-                    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper, bool use_pdvd_map);
+    void bin_window(std::vector<float> &input, 
+                    int num_time_bins, timestamp_t time_bin_width,
+                    int num_chan_bins, channel_t n_channels_on_plane, channel_t first_channel,
+                    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper,
+                    bool use_pdvd_map);
 
     void fill_entry_window(std::vector<Entry> &entry_input, std::vector<float> &input);
-
-    // Calculate average properties of TPs in a time window
-    float mean_sadc();
-    float mean_adc_peak();
-    float mean_tot();
 
     friend std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window);
 
     timestamp_t time_start;
     uint32_t adc_integral;
-    uint64_t adc_peak_sum;
-    uint64_t tot_sum;
     std::vector<TriggerPrimitive> tp_list;
   };
 }

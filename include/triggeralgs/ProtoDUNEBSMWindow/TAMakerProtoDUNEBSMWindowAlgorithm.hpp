@@ -28,7 +28,7 @@ public:
   void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta); 
   void configure(const nlohmann::json &config);
 
-  ~TAMakerProtoDUNEBSMWindowAlgorithm() override;
+  ~TAMakerProtoDUNEBSMWindowAlgorithm() override = default;
 
 private:
   // Function to handle XGBoost classification
@@ -40,7 +40,7 @@ private:
   // The current time window of TPs
   ProtoDUNEBSMWindow m_current_window;
 
-  timestamp_t m_last_pred_time;
+  timestamp_t m_last_pred_time = 0;
   uint64_t m_primitive_count = 0;
 
   // Possible to do batch predictions with XGBoost
@@ -52,19 +52,24 @@ private:
   std::vector<Entry> flat_batched_Entries;
 
   // Configurable parameters.
-  uint32_t m_adc_threshold = 200000;
-  float m_ratio_threshold = 0.65;
-  float m_bdt_threshold = 0.99;
-  timestamp_t m_window_length = 20000;
+  uint32_t m_adc_threshold_induction = 12000000;
+  float m_bdt_threshold = 0.999;
   std::string m_channel_map_name = "PD2VDTPCChannelMap";
   // End of configurable parameters
+  
+  // Constant parameters defined by XGBoost model training
+  // Currently both PD-HD and PD-VD XGBoost models have been trained
+  // on data filtered to have an ADC sum > 200k ADC
+  const uint32_t m_adc_threshold_collection = 200000;
+  const timestamp_t m_window_length = 20000;
+  // End constant parameters
 
   // Define time binning
-  timestamp_t m_bin_length = 4000;
-  int m_num_timebins = 5;
-  // Define channel binning
-  channel_t m_chan_bin_length = 100;
-  int m_num_chanbins = 5;
+  timestamp_t m_bin_length = 2000;
+  // Number of bins fixed by model training
+  const int m_num_timebins = 10;
+  // Number of bins fixed by model training
+  const int m_num_chanbins = 10;
 
   // Geometry information for binning
   std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap; 
@@ -78,9 +83,12 @@ private:
   std::unique_ptr<PDVDEffectiveChannelMap> m_pdvd_eff_channel_mapper = nullptr;
   // If in NP02 and using a PD-VD channel map, set this to true
   bool m_pdvd_map = true;
+  // Only use the XGBoost model if we are looking at collection plane TPs
+  bool m_collection_plane = false;
   // first and last channel on the plane
   channel_t m_first_channel;
-  channel_t m_last_channel;
+  // Number of channels on the plane (will be no. effective channels for PD-VD)
+  channel_t m_n_channels_on_plane;
 
   // Compiled treelite model interface
   std::unique_ptr<CompiledModelInterface> m_compiled_model_interface;
