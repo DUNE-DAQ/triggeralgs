@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(triggeralgs VERSION 1.6.0)
+project(triggeralgs VERSION 1.7.0)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -63,6 +63,7 @@ add_library(triggeralgs SHARED
   src/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.cpp
   src/ProtoDUNEBSMWindow/treelitemodel.cpp
   src/ProtoDUNEBSMWindow/models/treelitePDHDmodel.cpp
+  src/ProtoDUNEBSMWindow/models/treelitePDVDmodel.cpp
   src/ProtoDUNEBSMWindow/CompiledModelInterface.cpp
   src/TAWindow.cpp
   src/TPWindow.cpp

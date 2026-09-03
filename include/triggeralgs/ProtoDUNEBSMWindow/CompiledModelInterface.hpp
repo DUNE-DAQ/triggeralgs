@@ -17,20 +17,18 @@ class TreeliteModelBase;
 class CompiledModelInterface {
   public:
 
-    CompiledModelInterface(int nbatch);
+    CompiledModelInterface(int nbatch, bool is_pdvd);
 
     ~CompiledModelInterface();
 
     // Get number of features in model 
     int GetNumFeatures();
 
-    void ModelWarmUp(Entry *input);
-
     // Run prediction with GBDT
     void Predict(Entry *input, float *result);
 
     // Is it a neutrino or cosmic according to GBDT?
-    bool Classify(const float *result, float &bdt_threshold);
+    bool Classify(const float *result, float bdt_threshold);
 
   protected:
     

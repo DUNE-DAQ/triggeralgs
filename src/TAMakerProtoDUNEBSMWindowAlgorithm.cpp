@@ -25,31 +25,38 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
 {
   
   if(m_current_window.is_empty()){
+    // Reset window with new TP
     m_current_window.reset(input_tp);
+    // Initialise last time an XGBoost prediction was made
     m_last_pred_time = input_tp.time_start;
+    // Iterate number of TPs in the window
     m_primitive_count++;
-    // first time operator is called set ROP first and last channel
+    // First time operator is called set ROP first and last channel
     unsigned int detelement = channelMap->get_element_id_from_offline_channel(input_tp.channel);
     unsigned int plane = channelMap->get_plane_from_offline_channel(input_tp.channel);
 
+    // Are we on the collection plane? Use XGBoost model for collection plane TPs
+    // evaluate the sum of the TP charge if on induction planes
+    // Induction plane IDs = 0, 1
+    // Collection plane ID = 2
+    if (plane > 1) m_collection_plane = true;
+
+    // Use PlaneInfo object to get the first and last channels on plane
     PlaneInfo plane_info = m_det_plane_map.get_plane_info(m_channel_map_name, detelement, plane);
     m_first_channel = static_cast<channel_t>(plane_info.min_channel);
-    channel_t n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
+    m_n_channels_on_plane = static_cast<channel_t>(plane_info.n_channels);
 
     // If we are in PD-VD use 'effective' channel mapping for CRPs
-    if (m_pdvd_map) {
+    // (but only for collection plane)
+    if (m_pdvd_map && m_collection_plane) {
       m_pdvd_eff_channel_mapper = std::make_unique<PDVDEffectiveChannelMap>(plane_info.min_channel, plane_info.n_channels);
-
+      // Get the first effective channel and number of effective channels on the plane
       m_first_channel = m_pdvd_eff_channel_mapper->remapCollectionPlaneChannel(m_first_channel);
-      m_last_channel = m_first_channel + m_pdvd_eff_channel_mapper->getNEffectiveChannels();
-      m_chan_bin_length = m_pdvd_eff_channel_mapper->getNEffectiveChannels() / m_num_chanbins;
-    } else { // still in PD-HD, so don't need effective channel
-      m_last_channel = m_first_channel + n_channels_on_plane;
-      m_chan_bin_length = n_channels_on_plane / m_num_chanbins;
+      m_n_channels_on_plane = m_pdvd_eff_channel_mapper->getNEffectiveChannels();
     }
 
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", last Chan = " << m_last_channel << std::endl
-      << "Number of channel bins = " << m_num_chanbins << ", and channel bin length = " << m_chan_bin_length;
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] 1st Chan = " << m_first_channel << ", N channels on plane = " << m_n_channels_on_plane << std::endl
+      << "Number of channel bins = " << m_num_chanbins;
     return;
   } 
   
@@ -59,25 +66,37 @@ TAMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerPrimitive& input_tp, st
     TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Window not yet complete, adding the input_tp to the window.";
     m_current_window.add(input_tp);
   }
+
   // If the addition of the current TP to the window would make it longer
   // than the specified window length, don't add it
-  // Instead go through a series of filters and eventually a XGBoost model to determine whether to create a TA
-  else if (
-      (m_current_window.time_start - m_last_pred_time) > m_bin_length && // check enough time has passed since last window
-      m_current_window.tp_list.size() > 20 && // need enough TPs in window to bother
-      m_current_window.adc_integral > m_adc_threshold && // set a low minimum threshold for the ADC integral sum
-      (m_current_window.mean_adc_peak() / m_current_window.mean_tot()) > m_ratio_threshold && // mean peak / tot cut
-      compute_treelite_classification() // XGBoost classifier 
-      )
-  {
+  // First, if these are not collection plane TPs, just evaluate the total charge
+  // If the total charge on the induction plane crosses a threshold, create a TA
+  else if(!m_collection_plane && m_current_window.adc_integral > m_adc_threshold_induction){
     TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] ADC integral in window is greater than specified threshold.";
+    output_ta.push_back(construct_ta());
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Resetting window with input_tp.";                           
+    m_current_window.reset(input_tp);
+  }
+
+  // If the addition of the current TP to the window would make it longer
+  // than the specified window length, don't add it
+  // Check the TPs are on the collection plane - if they are we can use XGBoost
+  // Instead check whether it has been long enough since the last XGBoost prediction 
+  // then run the model to determine whether to create a TA
+  else if (m_collection_plane &&
+           (m_current_window.time_start - m_last_pred_time) > m_bin_length && // check enough time has passed since last window
+           m_current_window.adc_integral > m_adc_threshold_collection && // set a low minimum threshold for the ADC integral sum
+           compute_treelite_classification() // XGBoost classifier 
+          )
+  {
+    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:BSMW] XGBoost neutrino prob. is greater than specified threshold.";
     output_ta.push_back(construct_ta());
     TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TAM:BSMW] Resetting window with input_tp.";
     m_current_window.reset(input_tp);
   }
   // If it is not, move the window along.
   else{
-    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Window is at required length but adc threshold not met, shifting window along.";
+    TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Window is at required length but adc/bdt threshold not met, shifting window along.";
     m_current_window.move(input_tp, m_window_length);
   }
   
@@ -94,30 +113,16 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
 {
   if (config.is_object()){
     if (config.contains("channel_map_name")) m_channel_map_name = config["channel_map_name"];
-    if (config.contains("num_time_bins")) m_num_timebins = config["num_time_bins"];
-    if (config.contains("adc_threshold")) m_adc_threshold = config["adc_threshold"];
-    if (config.contains("ratio_threshold")) {
-      m_ratio_threshold = config["ratio_threshold"];
-      m_ratio_threshold *= 0.01;
-    }
-    if (config.contains("window_length")) {
-      m_window_length = config["window_length"];
-      m_bin_length = static_cast<timestamp_t>(m_window_length / m_num_timebins);
-    }
-    if (config.contains("bdt_threshold")) {
-      uint64_t int_bdt_threshold = config["bdt_threshold"];
-      if (int_bdt_threshold <= 100) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.01);
-      else if (int_bdt_threshold <= 1000) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.001);
-      else if (int_bdt_threshold <= 10000) m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.0001);
-      else m_bdt_threshold = static_cast<float>(int_bdt_threshold * 0.01);
-    }
+    if (config.contains("adc_threshold_induction")) m_adc_threshold_induction = config["adc_threshold_induction"];
+    if (config.contains("bdt_threshold")) m_bdt_threshold = config["bdt_threshold"];
   }
   else{
-    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:BSMW] The DEFAULT values of window_length and adc_threshold are being used.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TAM:BSMW] Use DEFAULT values of channel_map_name, adc_threshold_induction and bdt_threshold.";
   }
   
-  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Bin length is " << m_bin_length << " for a window of " << m_num_timebins << 
-    " bins. ADC threshold across window set to " << m_adc_threshold;
+  TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:BSMW] Channel map name is " << m_channel_map_name <<
+    ". ADC threshold for the induction planes set to " << m_adc_threshold_induction << 
+    ". BDT threshold for collection plane set to " << m_bdt_threshold;
   
   channelMap = dunedaq::detchannelmaps::make_tpc_map(m_channel_map_name);
 
@@ -128,14 +133,14 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
   } else { // else we are in PD-HD and we use true channel mapping
     m_pdvd_map = false;
   }
-  
-  m_compiled_model_interface = std::make_unique<CompiledModelInterface>(nbatch);
+
+  m_bin_length = static_cast<timestamp_t>(m_window_length / m_num_timebins);
+
+  m_compiled_model_interface = std::make_unique<CompiledModelInterface>(nbatch, m_pdvd_map);
 
   const size_t num_feature = m_compiled_model_interface->GetNumFeatures();
 
   flat_batched_inputs.resize(num_feature);
-
-  m_num_chanbins = num_feature / m_num_timebins;
 
   flat_batched_Entries.clear();
   for (size_t i = 0; i < num_feature; ++i) {
@@ -143,10 +148,6 @@ TAMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
     zero.fvalue = 0.0;
     flat_batched_Entries.emplace_back(zero);
   }
-}
-
-TAMakerProtoDUNEBSMWindowAlgorithm::~TAMakerProtoDUNEBSMWindowAlgorithm() {
-  // Nothing to clean up
 }
 
 TriggerActivity
@@ -169,7 +170,7 @@ TAMakerProtoDUNEBSMWindowAlgorithm::construct_ta() const
   ta.adc_peak = latest_tp_in_window.adc_peak;
   ta.detid = latest_tp_in_window.detid;
   ta.type = TriggerActivity::Type::kTPC;
-  ta.algorithm = TriggerActivity::Algorithm::kUnknown;
+  ta.algorithm = TriggerActivity::Algorithm::kProtoDUNEBSMWindow;
   ta.inputs = m_current_window.tp_list;
   return ta;
 }
@@ -179,9 +180,9 @@ bool TAMakerProtoDUNEBSMWindowAlgorithm::compute_treelite_classification() {
   m_last_pred_time = m_current_window.time_start;
   
   m_current_window.bin_window(
-      flat_batched_inputs, m_bin_length, 
-      m_chan_bin_length, m_num_timebins, 
-      m_num_chanbins, m_first_channel, 
+      flat_batched_inputs, 
+      m_num_timebins, m_bin_length,
+      m_num_chanbins, m_n_channels_on_plane, m_first_channel,
       m_pdvd_eff_channel_mapper, m_pdvd_map
       );
   
