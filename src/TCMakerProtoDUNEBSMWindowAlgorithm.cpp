@@ -27,7 +27,7 @@ void TCMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerActivity& activity
   std::vector<TriggerActivity::TriggerActivityData> ta_list = {static_cast<TriggerActivity::TriggerActivityData>(activity)};
 
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TCM:ADCSW] Emitting an "
-                             << dunedaq::trgdataformats::get_trigger_candidate_type_names()[m_tc_type]
+                             << dunedaq::trgdataformats::trigger_candidate_type_to_string(m_tc_type)
                              << " TriggerCandidate with AEAnomalyWindow algorithm" << (m_activity_count-1);
 
   TriggerCandidate tc;

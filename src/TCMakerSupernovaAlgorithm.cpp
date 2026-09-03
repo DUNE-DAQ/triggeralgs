@@ -24,7 +24,7 @@ TCMakerSupernovaAlgorithm::process(const TriggerActivity& activity, std::vector<
   // Yay! we have a trigger!
   if (m_activity.size() > m_threshold) {
 
-    detid_t detid = dunedaq::trgdataformats::WHOLE_DETECTOR;
+    detid_t detid = dunedaq::trgdataformats::g_whole_detector;
 
     TriggerCandidate tc;
     tc.time_start = time - 500'000'000; // time_start (10 seconds before the start of the activity)
