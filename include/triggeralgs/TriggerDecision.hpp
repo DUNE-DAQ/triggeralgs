@@ -22,11 +22,11 @@ struct TriggerDecision
   timestamp_t time_end = { 0 };
   timestamp_t time_trigger = { 0 };
   trigger_number_t trigger_number = { 0 };
-  uint32_t run_number = { 0 };     // NOLINT(build/unsigned)
-  uint32_t subrun_number = { 0 };  // NOLINT(build/unsigned)
-  uint32_t type = { 0 };           // NOLINT(build/unsigned)
-  uint32_t algorithm = { 0 };      // NOLINT(build/unsigned)
-  version_t version = { 0 };        // NOLINT(build/unsigned)
+  uint32_t run_number = { 0 };    // NOLINT(build/unsigned)
+  uint32_t subrun_number = { 0 }; // NOLINT(build/unsigned)
+  uint32_t type = { 0 };          // NOLINT(build/unsigned)
+  uint32_t algorithm = { 0 };     // NOLINT(build/unsigned)
+  version_t version = { 0 };      // NOLINT(build/unsigned)
 
   std::vector<TriggerCandidate> tc_list;
 };

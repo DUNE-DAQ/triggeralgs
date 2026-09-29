@@ -113,10 +113,10 @@ private:
 
   // Configurable parameters.
   // triggeractivitymakerhorizontalmuon::ConfParams m_conf;
-  bool debug = false;                    // Use to control whether functions write out useful info
-  uint16_t m_adjacency_threshold = 15;   // Default is 15 for trigger
-  int m_max_adjacency = 0;               // The maximum adjacency seen so far in any window
-  uint16_t m_adj_tolerance = 3;          // Adjacency tolerance - default is 3 from coldbox testing.
+  bool debug = false;                  // Use to control whether functions write out useful info
+  uint16_t m_adjacency_threshold = 15; // Default is 15 for trigger
+  int m_max_adjacency = 0;             // The maximum adjacency seen so far in any window
+  uint16_t m_adj_tolerance = 3;        // Adjacency tolerance - default is 3 from coldbox testing.
   int index = 0;
   uint16_t ta_adc = 0;
   uint16_t ta_channels = 0;

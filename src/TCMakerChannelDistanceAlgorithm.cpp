@@ -49,8 +49,7 @@ TCMakerChannelDistanceAlgorithm::set_tc_attributes()
 }
 
 void
-TCMakerChannelDistanceAlgorithm::process(const TriggerActivity& input_ta,
-                                              std::vector<TriggerCandidate>& output_tcs)
+TCMakerChannelDistanceAlgorithm::process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tcs)
 {
 
   // Start a new TC if not already going.

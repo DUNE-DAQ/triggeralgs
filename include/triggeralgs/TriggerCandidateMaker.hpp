@@ -60,10 +60,7 @@ public:
    * @param[in] intput_tp input TP reference for filtering
    * @return bool true if we want to keep the TP
    */
-  virtual bool preprocess(const TriggerActivity&)
-  {
-    return true;
-  }
+  virtual bool preprocess(const TriggerActivity&) { return true; }
 
   /**
    * @brief Post-processing/filtering of the TCs, e.g. prescale
@@ -92,7 +89,7 @@ public:
           continue;
         }
 
-        TLOG_DEBUG(TLVL_DEBUG_10) << "Emitting prescaled TriggerCandidate " << (m_tc_count-1);
+        TLOG_DEBUG(TLVL_DEBUG_10) << "Emitting prescaled TriggerCandidate " << (m_tc_count - 1);
         ++iter;
       }
     }
@@ -111,15 +108,15 @@ public:
 
     if (config.contains("tc_type_name")) {
       m_tc_type_out = static_cast<TriggerCandidate::Type>(
-          dunedaq::trgdataformats::string_to_trigger_candidate_type(config["tc_type_name"]));
+        dunedaq::trgdataformats::string_to_trigger_candidate_type(config["tc_type_name"]));
     }
 
     if (m_tc_type_out == TriggerCandidate::Type::kUnknown) {
       // 27-Feb-2025, KAB: moified the following statement to check whether the configuration
       // contains the tc_type_name parameter before trying to add it do the exception message.
-      throw(InvalidConfiguration(ERS_HERE, "Provided an unknown output TC type: " +
-                                 (config.contains("tc_type_name") ?
-                                  std::string(config["tc_type_name"]) : "null")));
+      throw(InvalidConfiguration(ERS_HERE,
+                                 "Provided an unknown output TC type: " +
+                                   (config.contains("tc_type_name") ? std::string(config["tc_type_name"]) : "null")));
     }
 
     TLOG() << "[TCM]: prescale   : " << m_prescale;
@@ -127,7 +124,7 @@ public:
   }
 
   std::atomic<uint64_t> m_data_vs_system_time = 0;
-  std::atomic<uint64_t> m_initial_offset = 0;  
+  std::atomic<uint64_t> m_initial_offset = 0;
 
   /// @brief Configurable prescale factor
   uint64_t m_prescale = 1;
@@ -136,7 +133,6 @@ public:
 
   /// @brief Configurable TC type output
   TriggerCandidate::Type m_tc_type_out = TriggerCandidate::Type::kUnknown;
-
 };
 
 } // namespace triggeralgs

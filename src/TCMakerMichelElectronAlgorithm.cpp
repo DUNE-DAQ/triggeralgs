@@ -17,13 +17,12 @@ using namespace triggeralgs;
 
 using Logging::TLVL_DEBUG_ALL;
 using Logging::TLVL_DEBUG_HIGH;
-using Logging::TLVL_DEBUG_LOW;
 using Logging::TLVL_DEBUG_INFO;
+using Logging::TLVL_DEBUG_LOW;
 using Logging::TLVL_VERY_IMPORTANT;
 
 void
-TCMakerMichelElectronAlgorithm::process(const TriggerActivity& activity,
-                                                std::vector<TriggerCandidate>& output_tc)
+TCMakerMichelElectronAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& output_tc)
 {
 
   std::vector<TriggerActivity::TriggerActivityData> ta_list = { static_cast<TriggerActivity::TriggerActivityData>(
@@ -84,11 +83,12 @@ TCMakerMichelElectronAlgorithm::process(const TriggerActivity& activity,
   }
   // If it is not, move the window along.
   else {
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TCM:ME] Window is at required length but specified threshold not met, shifting window along.";
+    TLOG_DEBUG(TLVL_DEBUG_HIGH)
+      << "[TCM:ME] Window is at required length but specified threshold not met, shifting window along.";
     m_current_window.move(activity, m_window_length);
   }
 
-  //TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TCM:ME] " m_current_window;
+  // TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TCM:ME] " m_current_window;
 
   m_activity_count++;
 
@@ -137,7 +137,7 @@ TCMakerMichelElectronAlgorithm::construct_tc() const
   tc.time_end = latest_ta_in_window.time_end;
   tc.time_candidate = m_current_window.time_start;
   tc.detid = latest_ta_in_window.detid;
-  tc.type = m_tc_type_out; 
+  tc.type = m_tc_type_out;
   tc.algorithm = TriggerCandidate::Algorithm::kMichelElectron;
 
   // Take the list of triggeralgs::TriggerActivity in the current

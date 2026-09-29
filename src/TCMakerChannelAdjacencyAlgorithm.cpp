@@ -23,8 +23,7 @@ using Logging::TLVL_DEBUG_MEDIUM;
 using Logging::TLVL_VERY_IMPORTANT;
 
 void
-TCMakerChannelAdjacencyAlgorithm::process(const TriggerActivity& activity,
-                                               std::vector<TriggerCandidate>& output_tc)
+TCMakerChannelAdjacencyAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& output_tc)
 {
 
   // The first time process() is called, reset window object.

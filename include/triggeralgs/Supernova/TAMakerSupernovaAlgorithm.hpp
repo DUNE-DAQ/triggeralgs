@@ -22,9 +22,11 @@ class TAMakerSupernovaAlgorithm : public TriggerActivityMaker
   /// This activity maker makes an activity with all the trigger primitives
   inline bool is_time_consistent(const TriggerPrimitive& input_tp) const
   {
-    timestamp_t tend = input_tp.time_start + input_tp.samples_over_threshold * 32; // FIXME: Replace the hard-coded SOT to TOT scaling.
+    timestamp_t tend =
+      input_tp.time_start + input_tp.samples_over_threshold * 32; // FIXME: Replace the hard-coded SOT to TOT scaling.
 
-    bool is_close_to_edge = (m_time_tolerance > abs(timestamp_diff_t(input_tp.time_start) - timestamp_diff_t(m_time_end))) ||
+    bool is_close_to_edge =
+      (m_time_tolerance > abs(timestamp_diff_t(input_tp.time_start) - timestamp_diff_t(m_time_end))) ||
       m_time_tolerance > abs(timestamp_diff_t(input_tp.time_start) - timestamp_diff_t(m_time_start)) ||
       m_time_tolerance > abs(timestamp_diff_t(tend) - timestamp_diff_t(m_time_end)) ||
       m_time_tolerance > abs(timestamp_diff_t(tend) - timestamp_diff_t(m_time_start));
@@ -86,9 +88,9 @@ private:
   channel_diff_t m_channel_start = 0; // NOLINT(build/unsigned)
   channel_diff_t m_channel_end = 0;   // NOLINT(build/unsigned)
   channel_diff_t m_channel_peak = 0;  // NOLINT(build/unsigned)
-  uint64_t m_adc_integral = 0;  // NOLINT(build/unsigned)
-  uint16_t m_adc_peak = 0;      // NOLINT(build/unsigned)
-  detid_t m_detid = 0;         // NOLINT(build/unsigned)
+  uint64_t m_adc_integral = 0;        // NOLINT(build/unsigned)
+  uint16_t m_adc_peak = 0;            // NOLINT(build/unsigned)
+  detid_t m_detid = 0;                // NOLINT(build/unsigned)
   TriggerActivity::Type m_type = TriggerActivity::Type::kTPC;
   TriggerActivity::Algorithm m_algorithm = TriggerActivity::Algorithm::kSupernova;
 

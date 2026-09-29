@@ -9,8 +9,8 @@
 #ifndef TRIGGERALGS_SRC_TRIGGERALGS_SUPERNOVA_TRIGGERDECISIONMAKERSUPERNOVA_HPP_
 #define TRIGGERALGS_SRC_TRIGGERALGS_SUPERNOVA_TRIGGERDECISIONMAKERSUPERNOVA_HPP_
 
-#include "triggeralgs/TriggerDecisionMaker.hpp"
 #include "trgdataformats/Types.hpp"
+#include "triggeralgs/TriggerDecisionMaker.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -39,8 +39,9 @@ protected:
   void FlushOldCandidate(dunedaq::trgdataformats::timestamp_t time_now)
   {
     dunedaq::trgdataformats::timestamp_diff_t how_far = time_now - m_time_window;
-    auto end = std::remove_if(
-                              m_candidate.begin(), m_candidate.end(), [how_far, this](auto& c) -> bool { return (static_cast<dunedaq::trgdataformats::timestamp_diff_t>(c.time_start) < how_far); });
+    auto end = std::remove_if(m_candidate.begin(), m_candidate.end(), [how_far, this](auto& c) -> bool {
+      return (static_cast<dunedaq::trgdataformats::timestamp_diff_t>(c.time_start) < how_far);
+    });
     m_candidate.erase(end, m_candidate.end());
   }
 };

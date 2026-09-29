@@ -24,14 +24,15 @@ TAMakerSupernovaAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
   // auto now = std::chrono::steady_clock::now();
   // m_algorithm = (uint32_t)pd_clock(now.time_since_epoch()).count();
 
-  timestamp_t tend = input_tp.time_start + input_tp.samples_over_threshold * 32;  // FIXME: Replace the hard-coded SOT to TOT scaling.
+  timestamp_t tend =
+    input_tp.time_start + input_tp.samples_over_threshold * 32; // FIXME: Replace the hard-coded SOT to TOT scaling.
 
   if (m_time_start == 0) {
     m_tp_list.erase(m_tp_list.begin(), m_tp_list.end());
     m_tp_list.push_back(input_tp);
     m_time_start = input_tp.time_start;
     m_time_end = tend;
-    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
     m_channel_start = input_tp.channel;
     m_channel_end = input_tp.channel;
     m_channel_peak = input_tp.channel;
@@ -50,7 +51,7 @@ TAMakerSupernovaAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     m_tp_list.push_back(input_tp);
     m_time_start = input_tp.time_start;
     m_time_end = tend;
-    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
     m_channel_start = input_tp.channel;
     m_channel_end = input_tp.channel;
     m_channel_peak = input_tp.channel;
@@ -67,7 +68,7 @@ TAMakerSupernovaAlgorithm::process(const TriggerPrimitive& input_tp, std::vector
     m_time_end = tend;
 
   if (input_tp.adc_peak > m_adc_peak) {
-    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+    m_time_peak = input_tp.samples_to_peak * 32 + input_tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
     m_adc_peak = input_tp.adc_peak;
     m_channel_peak = input_tp.channel;
   }

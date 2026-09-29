@@ -18,15 +18,15 @@ using namespace triggeralgs;
 using Logging::TLVL_DEBUG_LOW;
 
 void
-TAMakerChannelAdjacencyAlgorithm::process(const TriggerPrimitive& input_tp,
-                                              std::vector<TriggerActivity>& output_ta)
+TAMakerChannelAdjacencyAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
 {
 
   // Add useful info about recived TPs here for FW and SW TPG guys.
   if (m_print_tp_info) {
     TLOG_DEBUG(TLVL_DEBUG_LOW) << " ########## m_current_window is reset ##########\n"
                                << " TP Start Time: " << input_tp.time_start << ", TP ADC Sum: " << input_tp.adc_integral
-                               << ", TP SOT: " << input_tp.samples_over_threshold << ", TP ADC Peak: " << input_tp.adc_peak
+                               << ", TP SOT: " << input_tp.samples_over_threshold
+                               << ", TP ADC Peak: " << input_tp.adc_peak
                                << ", TP Offline Channel ID: " << input_tp.channel << "\n";
   }
 
@@ -118,7 +118,7 @@ TAMakerChannelAdjacencyAlgorithm::construct_ta(TPWindow win_adj_max) const
 
   ta.time_start = last_tp.time_start;
   ta.time_end = last_tp.time_start;
-  ta.time_peak = last_tp.samples_to_peak * 32 + last_tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+  ta.time_peak = last_tp.samples_to_peak * 32 + last_tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
   ta.time_activity = ta.time_peak;
   ta.channel_start = last_tp.channel;
   ta.channel_end = last_tp.channel;
@@ -136,7 +136,7 @@ TAMakerChannelAdjacencyAlgorithm::construct_ta(TPWindow win_adj_max) const
     ta.channel_start = std::min(ta.channel_start, channel_t(tp.channel));
     ta.channel_end = std::max(ta.channel_end, channel_t(tp.channel));
     if (tp.adc_peak > ta.adc_peak) {
-      ta.time_peak = tp.samples_to_peak * 32 + tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+      ta.time_peak = tp.samples_to_peak * 32 + tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
       ta.adc_peak = tp.adc_peak;
       ta.channel_peak = tp.channel;
     }

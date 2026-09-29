@@ -17,10 +17,10 @@ using namespace triggeralgs;
 
 void
 TCMakerPrescaleAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
-{ 
+{
   std::vector<TriggerActivity::TriggerActivityData> ta_list;
   ta_list.push_back(static_cast<TriggerActivity::TriggerActivityData>(activity));
-  
+
   TriggerCandidate tc;
   tc.time_start = activity.time_start;
   tc.time_end = activity.time_end;
@@ -35,14 +35,14 @@ TCMakerPrescaleAlgorithm::process(const TriggerActivity& activity, std::vector<T
 
   // Update OpMon Variable(s)
   uint64_t system_time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-  uint64_t data_time = activity.time_start*16e-6;       // Convert 62.5 MHz ticks to ms    
+  uint64_t data_time = activity.time_start * 16e-6;     // Convert 62.5 MHz ticks to ms
   m_data_vs_system_time.store(data_time - system_time); // Store the difference for OpMon
 
   cand.push_back(tc);
 }
 
 void
-TCMakerPrescaleAlgorithm::configure(const nlohmann::json &config)
+TCMakerPrescaleAlgorithm::configure(const nlohmann::json& config)
 {
   TriggerCandidateMaker::configure(config);
 }

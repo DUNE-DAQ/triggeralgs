@@ -16,14 +16,13 @@
 using namespace triggeralgs;
 
 using Logging::TLVL_DEBUG_HIGH;
-using Logging::TLVL_DEBUG_MEDIUM;
-using Logging::TLVL_DEBUG_LOW;
 using Logging::TLVL_DEBUG_INFO;
+using Logging::TLVL_DEBUG_LOW;
+using Logging::TLVL_DEBUG_MEDIUM;
 using Logging::TLVL_VERY_IMPORTANT;
 
 void
-TCMakerPlaneCoincidenceAlgorithm::process(const TriggerActivity& activity,
-                                                std::vector<TriggerCandidate>& output_tc)
+TCMakerPlaneCoincidenceAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& output_tc)
 {
 
   std::vector<TriggerActivity::TriggerActivityData> ta_list = { static_cast<TriggerActivity::TriggerActivityData>(
@@ -84,7 +83,8 @@ TCMakerPlaneCoincidenceAlgorithm::process(const TriggerActivity& activity,
   }
   // If it is not, move the window along.
   else {
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TCM:PC] TAWindow is at required length but specified threshold not met, shifting window along.";
+    TLOG_DEBUG(TLVL_DEBUG_HIGH)
+      << "[TCM:PC] TAWindow is at required length but specified threshold not met, shifting window along.";
     m_current_window.move(activity, m_window_length);
   }
 

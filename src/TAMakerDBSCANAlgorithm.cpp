@@ -24,32 +24,34 @@ using Logging::TLVL_DEBUG_LOW;
 void
 TAMakerDBSCANAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
 {
-  if(input_tp.time_start < m_prev_timestamp){
-    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:DBS] Out-of-order TPs: prev " << m_prev_timestamp << ", current " << input_tp.time_start;
+  if (input_tp.time_start < m_prev_timestamp) {
+    TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TAM:DBS] Out-of-order TPs: prev " << m_prev_timestamp << ", current "
+                               << input_tp.time_start;
     return;
   }
-  
+
   m_dbscan_clusters.clear();
   m_dbscan->add_primitive(input_tp, &m_dbscan_clusters);
 
-  uint64_t t0=m_dbscan->get_first_prim_time();
-  
-  for(auto const& cluster : m_dbscan_clusters){
-    auto& ta=output_ta.emplace_back();
+  uint64_t t0 = m_dbscan->get_first_prim_time();
+
+  for (auto const& cluster : m_dbscan_clusters) {
+    auto& ta = output_ta.emplace_back();
 
     ta.time_start = std::numeric_limits<timestamp_t>::max();
     ta.time_end = 0;
     ta.channel_start = std::numeric_limits<channel_t>::max();
     ta.channel_end = 0;
-    ta.adc_integral =  0;
-    
-    for(auto const& hit : cluster.hits){
-      auto const& prim=hit->primitive;
+    ta.adc_integral = 0;
+
+    for (auto const& hit : cluster.hits) {
+      auto const& prim = hit->primitive;
 
       ta.inputs.push_back(prim);
-      
+
       ta.time_start = std::min(prim.time_start, ta.time_start);
-      ta.time_end = std::max(prim.time_start + prim.samples_over_threshold * 32, ta.time_end);  // FIXME: Replace the hard-coded SOT to TOT scaling.
+      ta.time_end = std::max(prim.time_start + prim.samples_over_threshold * 32,
+                             ta.time_end); // FIXME: Replace the hard-coded SOT to TOT scaling.
 
       ta.channel_start = std::min(channel_t(prim.channel), ta.channel_start);
       ta.channel_end = std::max(channel_t(prim.channel), ta.channel_end);
@@ -60,7 +62,8 @@ TAMakerDBSCANAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<Tr
       if (prim.adc_peak > ta.adc_peak) {
         ta.adc_peak = prim.adc_peak;
         ta.channel_peak = prim.channel;
-        ta.time_peak = prim.samples_to_peak * 32 + prim.time_start;  // FIXME: Replace hard-coded STP to `time_peak` conversion.
+        ta.time_peak =
+          prim.samples_to_peak * 32 + prim.time_start; // FIXME: Replace hard-coded STP to `time_peak` conversion.
       }
     }
     ta.time_activity = ta.time_peak;
@@ -77,14 +80,13 @@ TAMakerDBSCANAlgorithm::configure(const nlohmann::json& config)
 {
   TriggerActivityMaker::configure(config);
 
-  if (config.is_object())
-  {
+  if (config.is_object()) {
     if (config.contains("min_pts"))
       m_min_pts = config["min_pts"];
     if (config.contains("eps"))
       m_eps = config["eps"];
   }
-  m_dbscan=std::make_unique<dbscan::IncrementalDBSCAN>(m_eps, m_min_pts, 10000);
+  m_dbscan = std::make_unique<dbscan::IncrementalDBSCAN>(m_eps, m_min_pts, 10000);
 }
 
 // Register algo in TA Factory

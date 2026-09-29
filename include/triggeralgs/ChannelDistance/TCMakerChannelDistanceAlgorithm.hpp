@@ -14,17 +14,18 @@
 
 namespace triggeralgs {
 
-class TCMakerChannelDistanceAlgorithm : public TriggerCandidateMaker {
-  public:
-    void process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tcs);
-    void configure(const nlohmann::json& config);
-    void set_tc_attributes();
+class TCMakerChannelDistanceAlgorithm : public TriggerCandidateMaker
+{
+public:
+  void process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tcs);
+  void configure(const nlohmann::json& config);
+  void set_tc_attributes();
 
-  private:
-    void set_new_tc(const TriggerActivity& input_ta);
-    TriggerCandidate m_current_tc;
-    uint16_t m_current_tp_count;
-    uint16_t m_max_tp_count = 1000; // Produce a TC when this count is exceeded. AEO: Arbitrary choice of 1000.
+private:
+  void set_new_tc(const TriggerActivity& input_ta);
+  TriggerCandidate m_current_tc;
+  uint16_t m_current_tp_count;
+  uint16_t m_max_tp_count = 1000; // Produce a TC when this count is exceeded. AEO: Arbitrary choice of 1000.
 };
 
 } // namespace triggeralgs

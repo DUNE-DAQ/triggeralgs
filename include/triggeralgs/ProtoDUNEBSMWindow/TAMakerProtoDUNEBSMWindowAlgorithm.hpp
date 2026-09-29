@@ -10,23 +10,23 @@
 #define TRIGGERALGS_PROTODUNEBSMWINDOW_TRIGGERACTIVITYMAKERBSMWINDOW_HPP_
 
 #include "detchannelmaps/TPCChannelMap.hpp"
-#include "triggeralgs/TriggerActivityFactory.hpp"
-#include "triggeralgs/Types.hpp"
-#include "triggeralgs/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.hpp"
 #include "triggeralgs/ProtoDUNEBSMWindow/CompiledModelInterface.hpp"
 #include "triggeralgs/ProtoDUNEBSMWindow/DetectorPlaneMap.hpp"
 #include "triggeralgs/ProtoDUNEBSMWindow/PDVDEffectiveChannelMap.hpp"
+#include "triggeralgs/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.hpp"
+#include "triggeralgs/TriggerActivityFactory.hpp"
+#include "triggeralgs/Types.hpp"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace triggeralgs {
 class TAMakerProtoDUNEBSMWindowAlgorithm : public TriggerActivityMaker
 {
 
 public:
-  void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta); 
-  void configure(const nlohmann::json &config);
+  void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta);
+  void configure(const nlohmann::json& config);
 
   ~TAMakerProtoDUNEBSMWindowAlgorithm() override = default;
 
@@ -36,7 +36,7 @@ private:
   bool compute_treelite_classification();
 
   TriggerActivity construct_ta() const;
-  
+
   // The current time window of TPs
   ProtoDUNEBSMWindow m_current_window;
 
@@ -56,7 +56,7 @@ private:
   float m_bdt_threshold = 0.999;
   std::string m_channel_map_name = "PD2VDTPCChannelMap";
   // End of configurable parameters
-  
+
   // Constant parameters defined by XGBoost model training
   // Currently both PD-HD and PD-VD XGBoost models have been trained
   // on data filtered to have an ADC sum > 200k ADC
@@ -72,9 +72,9 @@ private:
   const int m_num_chanbins = 10;
 
   // Geometry information for binning
-  std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap; 
+  std::shared_ptr<dunedaq::detchannelmaps::TPCChannelMap> channelMap;
   // First channel in each plane and number of channels
-  // in a plane not in channel map by default, so add 
+  // in a plane not in channel map by default, so add
   // a struct to access these values
   DetectorPlaneMap m_det_plane_map;
   // In PD-VD want to work with effective offline channel
@@ -92,7 +92,6 @@ private:
 
   // Compiled treelite model interface
   std::unique_ptr<CompiledModelInterface> m_compiled_model_interface;
-
 };
 } // namespace triggeralgs
 

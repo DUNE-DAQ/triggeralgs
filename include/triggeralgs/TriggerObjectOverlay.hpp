@@ -9,13 +9,12 @@
 #ifndef TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGEROBJECTOVERLAY_HPP_
 #define TRIGGERALGS_INCLUDE_TRIGGERALGS_TRIGGEROBJECTOVERLAY_HPP_
 
-
 #include "trgdataformats/TriggerActivityData.hpp"
 #include "trgdataformats/TriggerObjectOverlay.hpp"
 
-#include "triggeralgs/TriggerPrimitive.hpp"
 #include "triggeralgs/TriggerActivity.hpp"
 #include "triggeralgs/TriggerCandidate.hpp"
+#include "triggeralgs/TriggerPrimitive.hpp"
 
 namespace triggeralgs {
 
@@ -48,7 +47,8 @@ struct TypeToOverlayType<TriggerCandidate>
 // Populate a TriggerObjectOverlay in `buffer`, created from
 // `object`. The necessary size for the buffer can be found with
 // `get_overlay_nbytes()`
-template<class Object, class Overlay = typename TypeToOverlayType<Object>::overlay_t,
+template<class Object,
+         class Overlay = typename TypeToOverlayType<Object>::overlay_t,
          class Data = typename TypeToOverlayType<Object>::data_t>
 void
 write_overlay(const Object& object, void* buffer)
@@ -73,7 +73,8 @@ get_overlay_nbytes(const Object& object)
 // Given an overlay object (dunedaq::trgdataformats::TriggerActivity or
 // dunedaq::trgdataformats::TriggerCandidate), create a corresponding non-overlay object
 // (triggeralgs::TriggerActivity or triggeralgs::TriggerCandidate) with the same contents, and return it
-template<class Object, class Overlay = typename TypeToOverlayType<Object>::overlay_t,
+template<class Object,
+         class Overlay = typename TypeToOverlayType<Object>::overlay_t,
          class Data = typename TypeToOverlayType<Object>::data_t>
 Object
 read_overlay(const Overlay& overlay)

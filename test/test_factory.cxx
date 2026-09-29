@@ -23,17 +23,18 @@ namespace triggeralgs {
 
 BOOST_AUTO_TEST_CASE(test_macro_overview)
 {
-  std::unique_ptr<TriggerActivityMaker> prescale_maker = TriggerActivityFactory::makeTAMaker("TAMakerPrescaleAlgorithm");
+  std::unique_ptr<TriggerActivityMaker> prescale_maker =
+    TriggerActivityFactory::makeTAMaker("TAMakerPrescaleAlgorithm");
 
   std::vector<TriggerActivity> prescale_ta;
   TriggerPrimitive some_tp;
   for (int idx = 0; idx < 10; idx++) {
     some_tp.time_start = idx;
-    some_tp.samples_to_peak = 1+idx;
+    some_tp.samples_to_peak = 1 + idx;
     some_tp.samples_over_threshold = 2;
-    some_tp.adc_integral = 1000+idx;
-    some_tp.adc_peak = 1000+idx;
-    some_tp.channel = 0+idx;
+    some_tp.adc_integral = 1000 + idx;
+    some_tp.adc_peak = 1000 + idx;
+    some_tp.channel = 0 + idx;
     some_tp.detid = 0;
     (*prescale_maker)(some_tp, prescale_ta);
   }

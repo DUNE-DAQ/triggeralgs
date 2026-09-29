@@ -9,7 +9,6 @@
 #include "triggeralgs/HorizontalMuon/TAMakerHorizontalMuonAlgorithm.hpp"
 #include "TRACE/trace.h"
 #define TRACE_NAME "TAMakerHorizontalMuonAlgorithm"
-#include <vector>
 #include <math.h>
 #include <vector>
 
@@ -19,8 +18,7 @@ using Logging::TLVL_DEBUG_ALL;
 using Logging::TLVL_DEBUG_MEDIUM;
 
 void
-TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
-                                        std::vector<TriggerActivity>& output_ta)
+TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta)
 {
 
   uint16_t adjacency;
@@ -29,7 +27,8 @@ TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
   if (m_print_tp_info) {
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:HM] TP Start Time: " << input_tp.time_start
                                << ", TP ADC Sum: " << input_tp.adc_integral
-                               << ", TP SOT: " << input_tp.samples_over_threshold << ", TP ADC Peak: " << input_tp.adc_peak
+                               << ", TP SOT: " << input_tp.samples_over_threshold
+                               << ", TP ADC Peak: " << input_tp.adc_peak
                                << ", TP Offline Channel ID: " << input_tp.channel;
     TLOG_DEBUG(TLVL_DEBUG_ALL) << "[TAM:HM] Adjacency of current window is: " << check_adjacency();
   }
@@ -57,7 +56,7 @@ TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
     auto ta = construct_ta();
 
     TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TA:HM]: Emitting ADC threshold trigger with " << m_current_window.adc_integral
-                                  << " window ADC integral. ta.time_start=" << ta.time_start 
+                                  << " window ADC integral. ta.time_start=" << ta.time_start
                                   << " ta.time_end=" << ta.time_end;
 
     output_ta.push_back(ta);
@@ -71,8 +70,8 @@ TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
   // on channel multiplicity, make a TA and start a fresh window with the current TP.
   else if (m_current_window.n_channels_hit() > m_n_channels_threshold && m_trigger_on_n_channels) {
 
-    TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TAM:HM] Emitting multiplicity trigger with "
-                                  << m_current_window.n_channels_hit() << " unique channels hit.";
+    TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TAM:HM] Emitting multiplicity trigger with " << m_current_window.n_channels_hit()
+                                  << " unique channels hit.";
 
     output_ta.push_back(construct_ta());
     m_current_window.reset(input_tp);
@@ -85,15 +84,15 @@ TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
   // on adjacency, then create a TA and reset the window with the new/current TP.
   else if ((adjacency = check_adjacency()) > m_adjacency_threshold && m_trigger_on_adjacency) {
 
-    //for (auto tp : m_current_window.inputs){ dump_tp(tp); }
+    // for (auto tp : m_current_window.inputs){ dump_tp(tp); }
 
     // Check for a new maximum, display the largest seen adjacency in the log.
     // uint16_t adjacency = check_adjacency();
-    if (adjacency > m_max_adjacency) { 
-      m_max_adjacency = adjacency; 
+    if (adjacency > m_max_adjacency) {
+      m_max_adjacency = adjacency;
     }
-    TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TAM:HM] Emitting track and multiplicity TA with adjacency "
-                                  << check_adjacency() << " and multiplicity " << m_current_window.n_channels_hit()
+    TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TAM:HM] Emitting track and multiplicity TA with adjacency " << check_adjacency()
+                                  << " and multiplicity " << m_current_window.n_channels_hit()
                                   << ". The ADC integral of this TA is " << m_current_window.adc_integral
                                   << " and the largest longest track seen so far is " << m_max_adjacency;
 
@@ -107,7 +106,8 @@ TAMakerHorizontalMuonAlgorithm::process(const TriggerPrimitive& input_tp,
     // If the incoming TP has a large time over threshold, we might have a cluster of
     // interesting physics activity surrounding it. Trigger on that.
     TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "[TAM:HM] Emitting a TA due to a TP with a very large samples over threshold: "
-                                  << input_tp.samples_over_threshold << " ticks and offline channel: " << input_tp.channel
+                                  << input_tp.samples_over_threshold
+                                  << " ticks and offline channel: " << input_tp.channel
                                   << ", where the ADC integral of that TP is " << input_tp.adc_integral;
     output_ta.push_back(construct_ta());
     m_current_window.reset(input_tp);
@@ -149,8 +149,7 @@ TAMakerHorizontalMuonAlgorithm::configure(const nlohmann::json& config)
       m_trigger_on_sot = config["trigger_on_sot"];
     if (config.contains("sot_threshold"))
       m_sot_threshold = config["sot_threshold"];
- }
-
+  }
 }
 
 TriggerActivity
@@ -162,8 +161,9 @@ TAMakerHorizontalMuonAlgorithm::construct_ta() const
   TriggerPrimitive last_tp = m_current_window.inputs.back();
 
   ta.time_start = last_tp.time_start;
-  ta.time_end = last_tp.time_start + last_tp.samples_over_threshold * 32;  // FIXME: Replace the hard-coded SOT to TOT scaling.
-  ta.time_peak = last_tp.samples_to_peak * 32 + last_tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+  ta.time_end =
+    last_tp.time_start + last_tp.samples_over_threshold * 32;       // FIXME: Replace the hard-coded SOT to TOT scaling.
+  ta.time_peak = last_tp.samples_to_peak * 32 + last_tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
   ta.time_activity = ta.time_peak;
   ta.channel_start = last_tp.channel;
   ta.channel_end = last_tp.channel;
@@ -175,13 +175,14 @@ TAMakerHorizontalMuonAlgorithm::construct_ta() const
   ta.algorithm = TriggerActivity::Algorithm::kHorizontalMuon;
   ta.inputs = m_current_window.inputs;
 
-  for( const auto& tp : ta.inputs ) {
+  for (const auto& tp : ta.inputs) {
     ta.time_start = std::min(ta.time_start, tp.time_start);
-    ta.time_end = std::max(ta.time_end, tp.time_start + tp.samples_over_threshold * 32);  // FIXME: Replace the hard-coded SOT to TOT scaling.
+    ta.time_end = std::max(
+      ta.time_end, tp.time_start + tp.samples_over_threshold * 32); // FIXME: Replace the hard-coded SOT to TOT scaling.
     ta.channel_start = std::min(ta.channel_start, channel_t(tp.channel));
     ta.channel_end = std::max(ta.channel_end, channel_t(tp.channel));
     if (tp.adc_peak > ta.adc_peak) {
-      ta.time_peak = tp.samples_to_peak * 32 + tp.time_start;  // FIXME: Replace STP to `time_peak` conversion.
+      ta.time_peak = tp.samples_to_peak * 32 + tp.time_start; // FIXME: Replace STP to `time_peak` conversion.
       ta.adc_peak = tp.adc_peak;
       ta.channel_peak = tp.channel;
     }

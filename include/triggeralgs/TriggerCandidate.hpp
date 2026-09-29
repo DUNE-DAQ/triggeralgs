@@ -26,9 +26,13 @@ struct TriggerCandidate : public dunedaq::trgdataformats::TriggerCandidateData
   ~TriggerCandidate() = default;
 
   TriggerCandidate(dunedaq::trgdataformats::TriggerCandidateData&& data)
-      : dunedaq::trgdataformats::TriggerCandidateData(std::move(data)) {}
-  TriggerCandidate(const dunedaq::trgdataformats::TriggerCandidateData &data)
-      : dunedaq::trgdataformats::TriggerCandidateData(data) {}
+    : dunedaq::trgdataformats::TriggerCandidateData(std::move(data))
+  {
+  }
+  TriggerCandidate(const dunedaq::trgdataformats::TriggerCandidateData& data)
+    : dunedaq::trgdataformats::TriggerCandidateData(data)
+  {
+  }
 
   std::vector<dunedaq::trgdataformats::TriggerActivityData> inputs;
 };

@@ -21,8 +21,7 @@ using Logging::TLVL_DEBUG_HIGH;
 using Logging::TLVL_DEBUG_MEDIUM;
 
 void
-TCMakerHorizontalMuonAlgorithm::process(const TriggerActivity& activity,
-                                                std::vector<TriggerCandidate>& output_tc)
+TCMakerHorizontalMuonAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& output_tc)
 {
 
   std::vector<TriggerActivity::TriggerActivityData> ta_list = { static_cast<TriggerActivity::TriggerActivityData>(

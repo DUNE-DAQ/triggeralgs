@@ -12,17 +12,20 @@
 
 namespace triggeralgs {
 
-template <typename T>
+template<typename T>
 std::shared_ptr<AbstractFactory<T>> AbstractFactory<T>::s_single_factory = nullptr;
 
-template <typename T>
-typename AbstractFactory<T>::creation_map& AbstractFactory<T>::get_makers(){
+template<typename T>
+typename AbstractFactory<T>::creation_map&
+AbstractFactory<T>::get_makers()
+{
   static creation_map s_makers;
   return s_makers;
 }
 
-template <typename T>
-void AbstractFactory<T>::register_creator(const std::string alg_name, maker_creator creator)
+template<typename T>
+void
+AbstractFactory<T>::register_creator(const std::string alg_name, maker_creator creator)
 {
   creation_map& makers = get_makers();
   auto it = makers.find(alg_name);
@@ -35,8 +38,9 @@ void AbstractFactory<T>::register_creator(const std::string alg_name, maker_crea
   return;
 }
 
-template <typename T>
-std::unique_ptr<T> AbstractFactory<T>::build_maker(const std::string& alg_name)
+template<typename T>
+std::unique_ptr<T>
+AbstractFactory<T>::build_maker(const std::string& alg_name)
 {
   creation_map& makers = get_makers();
   auto it = makers.find(alg_name);
@@ -50,8 +54,9 @@ std::unique_ptr<T> AbstractFactory<T>::build_maker(const std::string& alg_name)
   return nullptr;
 }
 
-template <typename T>
-std::shared_ptr<AbstractFactory<T>> AbstractFactory<T>::get_instance()
+template<typename T>
+std::shared_ptr<AbstractFactory<T>>
+AbstractFactory<T>::get_instance()
 {
   if (s_single_factory == nullptr) {
     s_single_factory = std::make_shared<AbstractFactory<T>>();

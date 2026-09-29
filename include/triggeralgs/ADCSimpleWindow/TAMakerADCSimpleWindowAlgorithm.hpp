@@ -20,34 +20,30 @@ class TAMakerADCSimpleWindowAlgorithm : public TriggerActivityMaker
 
 public:
   void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_ta);
-  
-  void configure(const nlohmann::json &config);
 
-  class Window {
-    public:
-      friend std::ostream& operator<<(std::ostream& os, const Window& window);
+  void configure(const nlohmann::json& config);
 
-      bool is_empty() const{
-        return tp_list.empty();
-      };
-    
-      void add(TriggerPrimitive const &input_tp);
+  class Window
+  {
+  public:
+    friend std::ostream& operator<<(std::ostream& os, const Window& window);
 
-      void clear(){
-        tp_list.clear();
-      };
-      
-      void move(TriggerPrimitive const &input_tp, timestamp_t const &window_length);
+    bool is_empty() const { return tp_list.empty(); };
 
-      void reset(TriggerPrimitive const &input_tp);
+    void add(TriggerPrimitive const& input_tp);
 
-      timestamp_t time_start;
-      uint32_t adc_integral;
-      std::deque<TriggerPrimitive> tp_list;
+    void clear() { tp_list.clear(); };
+
+    void move(TriggerPrimitive const& input_tp, timestamp_t const& window_length);
+
+    void reset(TriggerPrimitive const& input_tp);
+
+    timestamp_t time_start;
+    uint32_t adc_integral;
+    std::deque<TriggerPrimitive> tp_list;
   };
 
-private:  
-
+private:
   TriggerActivity construct_ta() const;
 
   Window m_current_window;
@@ -59,9 +55,8 @@ private:
 
   // FIXME: should this be centrally defined?
   // FIXME 2: assumes the same conversion for all TPC types,  which is not the case (TPCE/BDE = 32, TDE=32.5)
-  const uint16_t k_sample_to_dts_ticks = 32; 
+  const uint16_t k_sample_to_dts_ticks = 32;
 };
-
 
 } // namespace triggeralgs
 

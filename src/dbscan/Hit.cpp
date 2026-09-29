@@ -8,34 +8,34 @@ namespace dbscan {
 //======================================================================
 HitSet::HitSet()
 {
-    hits.reserve(10);
+  hits.reserve(10);
 }
 
 //======================================================================
 void
 HitSet::insert(Hit* h)
 {
-    // We're typically inserting hits at or near the end, so do a
-    // linear scan instead of full binary search. This turns out to be much
-    // faster in our case
-    auto it = hits.rbegin();
-    while (it != hits.rend() && (*it)->time >= h->time) {
-        // Don't insert the hit if we already have it
-        if (*it == h) {
-            return;
-        }
-        ++it;
+  // We're typically inserting hits at or near the end, so do a
+  // linear scan instead of full binary search. This turns out to be much
+  // faster in our case
+  auto it = hits.rbegin();
+  while (it != hits.rend() && (*it)->time >= h->time) {
+    // Don't insert the hit if we already have it
+    if (*it == h) {
+      return;
     }
-    
-    if (it == hits.rend() || *it != h) {
-        hits.insert(it.base(), h);
-    }
+    ++it;
+  }
+
+  if (it == hits.rend() || *it != h) {
+    hits.insert(it.base(), h);
+  }
 }
 
 //======================================================================
 Hit::Hit(float _time, int _chan, const triggeralgs::TriggerPrimitive* _prim)
 {
-    reset(_time, _chan, _prim);
+  reset(_time, _chan, _prim);
 }
 
 //======================================================================
@@ -43,14 +43,14 @@ Hit::Hit(float _time, int _chan, const triggeralgs::TriggerPrimitive* _prim)
 void
 Hit::reset(float _time, int _chan, const triggeralgs::TriggerPrimitive* _prim)
 {
-    time=_time;
-    chan=_chan;
-    cluster=kUndefined;
-    connectedness=Connectedness::kUndefined;
-    neighbours.clear();
-    if(_prim){
-        primitive=*_prim;
-    }
+  time = _time;
+  chan = _chan;
+  cluster = kUndefined;
+  connectedness = Connectedness::kUndefined;
+  neighbours.clear();
+  if (_prim) {
+    primitive = *_prim;
+  }
 }
 
 //======================================================================
@@ -59,19 +59,19 @@ Hit::reset(float _time, int _chan, const triggeralgs::TriggerPrimitive* _prim)
 bool
 Hit::add_potential_neighbour(Hit* other, float eps, int minPts)
 {
-    if (other != this && euclidean_distance_sqr(*this, *other) < eps*eps) {
-        neighbours.insert(other);
-        if (neighbours.size() + 1 >= minPts) {
-            connectedness = Connectedness::kCore;
-        }
-        // Neighbourliness is symmetric
-        other->neighbours.insert(this);
-        if (other->neighbours.size() + 1 >= minPts) {
-            other->connectedness = Connectedness::kCore;
-        }
-        return true;
+  if (other != this && euclidean_distance_sqr(*this, *other) < eps * eps) {
+    neighbours.insert(other);
+    if (neighbours.size() + 1 >= minPts) {
+      connectedness = Connectedness::kCore;
     }
-    return false;
+    // Neighbourliness is symmetric
+    other->neighbours.insert(this);
+    if (other->neighbours.size() + 1 >= minPts) {
+      other->connectedness = Connectedness::kCore;
+    }
+    return true;
+  }
+  return false;
 }
 
 }

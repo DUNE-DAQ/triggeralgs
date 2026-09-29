@@ -13,23 +13,27 @@
 
 namespace triggeralgs {
 
-using Logging::TLVL_IMPORTANT;
 using Logging::TLVL_DEBUG_HIGH;
+using Logging::TLVL_IMPORTANT;
 
-void TCMakerBundleNAlgorithm::set_tc_attributes() {
-    // Using the first TA as reference.
-    dunedaq::trgdataformats::TriggerActivityData front_ta = m_current_tc.inputs.front();
+void
+TCMakerBundleNAlgorithm::set_tc_attributes()
+{
+  // Using the first TA as reference.
+  dunedaq::trgdataformats::TriggerActivityData front_ta = m_current_tc.inputs.front();
 
-    m_current_tc.time_start = front_ta.time_start;
-    m_current_tc.time_end = m_current_tc.inputs.back().time_end;
-    m_current_tc.time_candidate = front_ta.time_start; // TODO: Conforming. Do we change this?
-    m_current_tc.detid = front_ta.detid;
-    m_current_tc.type = m_tc_type_out;
-    m_current_tc.algorithm = TriggerCandidate::Algorithm::kBundle;
-    return;
+  m_current_tc.time_start = front_ta.time_start;
+  m_current_tc.time_end = m_current_tc.inputs.back().time_end;
+  m_current_tc.time_candidate = front_ta.time_start; // TODO: Conforming. Do we change this?
+  m_current_tc.detid = front_ta.detid;
+  m_current_tc.type = m_tc_type_out;
+  m_current_tc.algorithm = TriggerCandidate::Algorithm::kBundle;
+  return;
 }
 
-bool TCMakerBundleNAlgorithm::bundle_condition() {
+bool
+TCMakerBundleNAlgorithm::bundle_condition()
+{
   return m_current_tc.inputs.size() == m_bundle_size;
 }
 
@@ -40,7 +44,8 @@ TCMakerBundleNAlgorithm::process(const TriggerActivity& input_ta, std::vector<Tr
   m_current_tc.inputs.push_back(input_ta);
 
   if (bundle_condition()) {
-    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TC:BN] Emitting BundleN TriggerCandidate with " << m_current_tc.inputs.size() << " TAs.";
+    TLOG_DEBUG(TLVL_DEBUG_HIGH) << "[TC:BN] Emitting BundleN TriggerCandidate with " << m_current_tc.inputs.size()
+                                << " TAs.";
     set_tc_attributes();
     output_tcs.push_back(m_current_tc);
 
@@ -50,7 +55,8 @@ TCMakerBundleNAlgorithm::process(const TriggerActivity& input_ta, std::vector<Tr
 
   // Should never reach this step. In this case, send it out.
   if (m_current_tc.inputs.size() > m_bundle_size) {
-    TLOG_DEBUG(TLVL_IMPORTANT) << "[TC:BN] Emitting large BundleN TriggerCandidate with " << m_current_tc.inputs.size() << " TAs.";
+    TLOG_DEBUG(TLVL_IMPORTANT) << "[TC:BN] Emitting large BundleN TriggerCandidate with " << m_current_tc.inputs.size()
+                               << " TAs.";
     set_tc_attributes();
     output_tcs.push_back(m_current_tc);
 
@@ -70,4 +76,3 @@ TCMakerBundleNAlgorithm::configure(const nlohmann::json& config)
 
 REGISTER_TRIGGER_CANDIDATE_MAKER(TRACE_NAME, TCMakerBundleNAlgorithm)
 } // namespace triggeralgs
-

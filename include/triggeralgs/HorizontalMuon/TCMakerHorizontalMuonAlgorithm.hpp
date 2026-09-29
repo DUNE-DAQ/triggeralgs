@@ -9,8 +9,8 @@
 #ifndef TRIGGERALGS_HORIZONTALMUON_TRIGGERCANDIDATEMAKERHORIZONTALMUON_HPP_
 #define TRIGGERALGS_HORIZONTALMUON_TRIGGERCANDIDATEMAKERHORIZONTALMUON_HPP_
 
-#include "triggeralgs/TriggerCandidateFactory.hpp"
 #include "triggeralgs/TAWindow.hpp"
+#include "triggeralgs/TriggerCandidateFactory.hpp"
 
 #include <fstream>
 #include <vector>
@@ -25,7 +25,6 @@ public:
   void configure(const nlohmann::json& config);
 
 private:
-
   TriggerCandidate construct_tc() const;
   bool check_adjacency() const;
 

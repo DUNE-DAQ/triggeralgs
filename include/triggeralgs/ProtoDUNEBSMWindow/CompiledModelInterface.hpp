@@ -2,9 +2,9 @@
 #define TRIGGERALGS_COMPILEDMODELINTERFACE_HPP_
 
 #include "triggeralgs/ProtoDUNEBSMWindow/treelitemodel.hpp"
-#include <string>
-#include <fstream>
 #include <algorithm>
+#include <fstream>
+#include <string>
 
 namespace triggeralgs {
 
@@ -14,27 +14,25 @@ namespace triggeralgs {
 // Foward declare base class for the treelite model
 class TreeliteModelBase;
 
-class CompiledModelInterface {
-  public:
+class CompiledModelInterface
+{
+public:
+  CompiledModelInterface(int nbatch, bool is_pdvd);
 
-    CompiledModelInterface(int nbatch, bool is_pdvd);
+  ~CompiledModelInterface();
 
-    ~CompiledModelInterface();
+  // Get number of features in model
+  int GetNumFeatures();
 
-    // Get number of features in model 
-    int GetNumFeatures();
+  // Run prediction with GBDT
+  void Predict(Entry* input, float* result);
 
-    // Run prediction with GBDT
-    void Predict(Entry *input, float *result);
+  // Is it a neutrino or cosmic according to GBDT?
+  bool Classify(const float* result, float bdt_threshold);
 
-    // Is it a neutrino or cosmic according to GBDT?
-    bool Classify(const float *result, float bdt_threshold);
-
-  protected:
-    
-    std::unique_ptr<TreeliteModelBase> model_ptr;
-    int num_batch;
-
+protected:
+  std::unique_ptr<TreeliteModelBase> model_ptr;
+  int num_batch;
 };
 } // triggeralgs
 

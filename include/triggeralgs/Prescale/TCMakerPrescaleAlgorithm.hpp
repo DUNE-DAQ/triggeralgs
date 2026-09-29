@@ -20,11 +20,10 @@ class TCMakerPrescaleAlgorithm : public TriggerCandidateMaker
 public:
   /// The function that gets call when there is a new activity
   void process(const TriggerActivity&, std::vector<TriggerCandidate>&);
-  
-  void configure(const nlohmann::json &config);
-  
-private:
 
+  void configure(const nlohmann::json& config);
+
+private:
 };
 
 } // namespace triggeralgs

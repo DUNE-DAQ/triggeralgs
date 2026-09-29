@@ -20,13 +20,11 @@ class TCMakerADCSimpleWindowAlgorithm : public TriggerCandidateMaker
 public:
   /// The function that gets call when there is a new activity
   void process(const TriggerActivity&, std::vector<TriggerCandidate>&);
-  
-  void configure(const nlohmann::json &config);
-  
-private:
 
+  void configure(const nlohmann::json& config);
+
+private:
   uint64_t m_activity_count = 0; // NOLINT(build/unsigned)
-  
 };
 
 } // namespace triggeralgs

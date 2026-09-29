@@ -4,8 +4,8 @@ namespace dbscan {
 
 struct Point
 {
-    int chan;
-    float time;
+  int chan;
+  float time;
 };
 
 }

@@ -17,36 +17,37 @@ using namespace triggeralgs;
 
 using Logging::TLVL_DEBUG_LOW;
 
-void TCMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
-//TCMakerProtoDUNEBSMWindowAlgorithm::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
-{ 
+void
+TCMakerProtoDUNEBSMWindowAlgorithm::process(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
+// TCMakerProtoDUNEBSMWindowAlgorithm::operator()(const TriggerActivity& activity, std::vector<TriggerCandidate>& cand)
+{
 
   // For now, if there is any single activity from any one detector element, emit
   // a trigger candidate.
   m_activity_count++;
-  std::vector<TriggerActivity::TriggerActivityData> ta_list = {static_cast<TriggerActivity::TriggerActivityData>(activity)};
+  std::vector<TriggerActivity::TriggerActivityData> ta_list = { static_cast<TriggerActivity::TriggerActivityData>(
+    activity) };
 
   TLOG_DEBUG(TLVL_DEBUG_LOW) << "[TCM:ADCSW] Emitting an "
                              << dunedaq::trgdataformats::trigger_candidate_type_to_string(m_tc_type)
-                             << " TriggerCandidate with AEAnomalyWindow algorithm" << (m_activity_count-1);
+                             << " TriggerCandidate with AEAnomalyWindow algorithm" << (m_activity_count - 1);
 
   TriggerCandidate tc;
-  tc.time_start = activity.time_start; 
-  tc.time_end = activity.time_end;  
+  tc.time_start = activity.time_start;
+  tc.time_end = activity.time_end;
   tc.time_candidate = activity.time_activity;
   tc.detid = activity.detid;
   tc.type = m_tc_type;
-  //tc.algorithm = TriggerCandidate::Algorithm::kAEAnomalyWindow;
+  // tc.algorithm = TriggerCandidate::Algorithm::kAEAnomalyWindow;
   tc.algorithm = TriggerCandidate::Algorithm::kUnknown;
 
   tc.inputs = ta_list;
 
   cand.push_back(tc);
-
 }
 
 void
-TCMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json &config)
+TCMakerProtoDUNEBSMWindowAlgorithm::configure(const nlohmann::json& config)
 {
   TriggerCandidateMaker::configure(config);
   /*

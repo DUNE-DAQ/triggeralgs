@@ -26,9 +26,13 @@ struct TriggerActivity : public dunedaq::trgdataformats::TriggerActivityData
   ~TriggerActivity() = default;
 
   TriggerActivity(dunedaq::trgdataformats::TriggerActivityData&& data)
-      : dunedaq::trgdataformats::TriggerActivityData(std::move(data)) {}
-  TriggerActivity(const dunedaq::trgdataformats::TriggerActivityData &data)
-      : dunedaq::trgdataformats::TriggerActivityData(data) {}
+    : dunedaq::trgdataformats::TriggerActivityData(std::move(data))
+  {
+  }
+  TriggerActivity(const dunedaq::trgdataformats::TriggerActivityData& data)
+    : dunedaq::trgdataformats::TriggerActivityData(data)
+  {
+  }
 
   std::vector<TriggerPrimitive> inputs;
 };

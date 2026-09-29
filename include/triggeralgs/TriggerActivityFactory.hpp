@@ -8,19 +8,23 @@
 #ifndef TRIGGERALGS_TRIGGER_ACTIVITY_FACTORY_HPP_
 #define TRIGGERALGS_TRIGGER_ACTIVITY_FACTORY_HPP_
 
-#include "triggeralgs/TriggerActivityMaker.hpp"
 #include "triggeralgs/AbstractFactory.hpp"
+#include "triggeralgs/TriggerActivityMaker.hpp"
 
-#define REGISTER_TRIGGER_ACTIVITY_MAKER(tam_name, tam_class)                                                                                      \
-  static struct tam_class##Registrar {                                                                                                            \
-    tam_class##Registrar() {                                                                                                                      \
-      TriggerActivityFactory::register_creator(tam_name, []() -> std::unique_ptr<TriggerActivityMaker> {return std::make_unique<tam_class>();});   \
-    }                                                                                                                                             \
+#define REGISTER_TRIGGER_ACTIVITY_MAKER(tam_name, tam_class)                                                           \
+  static struct tam_class##Registrar                                                                                   \
+  {                                                                                                                    \
+    tam_class##Registrar()                                                                                             \
+    {                                                                                                                  \
+      TriggerActivityFactory::register_creator(                                                                        \
+        tam_name, []() -> std::unique_ptr<TriggerActivityMaker> { return std::make_unique<tam_class>(); });            \
+    }                                                                                                                  \
   } tam_class##_registrar;
 
 namespace triggeralgs {
 
-class TriggerActivityFactory : public AbstractFactory<TriggerActivityMaker> {};
+class TriggerActivityFactory : public AbstractFactory<TriggerActivityMaker>
+{};
 
 } /* namespace triggeralgs */
 

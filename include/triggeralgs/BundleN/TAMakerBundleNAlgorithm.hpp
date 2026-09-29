@@ -17,15 +17,15 @@ namespace triggeralgs {
 
 class TAMakerBundleNAlgorithm : public TriggerActivityMaker
 {
-  public:
-    void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_tas);
-    void configure(const nlohmann::json& config);
-    bool bundle_condition();
+public:
+  void process(const TriggerPrimitive& input_tp, std::vector<TriggerActivity>& output_tas);
+  void configure(const nlohmann::json& config);
+  bool bundle_condition();
 
-  private:
-      uint64_t m_bundle_size = 1;
-      TriggerActivity m_current_ta;
-      void set_ta_attributes();
+private:
+  uint64_t m_bundle_size = 1;
+  TriggerActivity m_current_ta;
+  void set_ta_attributes();
 };
 
 } // namespace triggeralgs

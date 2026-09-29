@@ -99,16 +99,16 @@ public:
           continue;
         }
 
-        TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "Emitting prescaled TriggerActivity " << (m_ta_count-1)
-                                      << " with time start/end/activity: " << iter->time_start
-                                      << " " << iter->time_end << " " << iter->time_activity;
+        TLOG_DEBUG(TLVL_DEBUG_MEDIUM) << "Emitting prescaled TriggerActivity " << (m_ta_count - 1)
+                                      << " with time start/end/activity: " << iter->time_start << " " << iter->time_end
+                                      << " " << iter->time_activity;
         ++iter;
       }
     }
   }
 
   virtual void flush(timestamp_t /* until */, std::vector<TriggerActivity>&) {}
-  virtual void configure(const nlohmann::json& config) 
+  virtual void configure(const nlohmann::json& config)
   {
     // Don't do anyting if the config does not exist
     if (!config.is_object()) {
@@ -123,7 +123,7 @@ public:
     TLOG() << "[TAM]: max sot   : " << m_max_samples_over_threshold;
     TLOG() << "[TAM]: prescale  : " << m_prescale;
   }
-  
+
   std::atomic<uint64_t> m_data_vs_system_time = 0;
   std::atomic<uint64_t> m_initial_offset = 0;
 

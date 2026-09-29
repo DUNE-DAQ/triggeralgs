@@ -21,7 +21,7 @@ class TCMakerDBSCANAlgorithm : public TriggerCandidateMaker
 
 public:
   void process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tc);
-  void configure(const nlohmann::json &config);
+  void configure(const nlohmann::json& config);
 
 private:
   void set_new_tc(const TriggerActivity& input_ta);

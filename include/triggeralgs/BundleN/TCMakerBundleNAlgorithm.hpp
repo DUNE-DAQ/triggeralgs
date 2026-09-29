@@ -15,17 +15,17 @@
 
 namespace triggeralgs {
 
-class TCMakerBundleNAlgorithm: public TriggerCandidateMaker
+class TCMakerBundleNAlgorithm : public TriggerCandidateMaker
 {
-  public:
-    void process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tcs);
-    void configure(const nlohmann::json& config);
-    bool bundle_condition();
+public:
+  void process(const TriggerActivity& input_ta, std::vector<TriggerCandidate>& output_tcs);
+  void configure(const nlohmann::json& config);
+  bool bundle_condition();
 
-  private:
-      uint64_t m_bundle_size = 1;
-      TriggerCandidate m_current_tc;
-      void set_tc_attributes();
+private:
+  uint64_t m_bundle_size = 1;
+  TriggerCandidate m_current_tc;
+  void set_tc_attributes();
 };
 
 } // namespace triggeralgs

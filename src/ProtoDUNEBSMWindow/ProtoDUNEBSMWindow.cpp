@@ -1,54 +1,64 @@
 #include "triggeralgs/ProtoDUNEBSMWindow/ProtoDUNEBSMWindow.hpp"
 
+#include <numeric>
 #include <ostream>
 #include <vector>
-#include <numeric>
 
 namespace triggeralgs {
-      
-bool ProtoDUNEBSMWindow::is_empty() const{
+
+bool
+ProtoDUNEBSMWindow::is_empty() const
+{
   return tp_list.empty();
 };
 
-void ProtoDUNEBSMWindow::add(TriggerPrimitive const &input_tp){
-  // Add the input TP's contribution to the total 
+void
+ProtoDUNEBSMWindow::add(TriggerPrimitive const& input_tp)
+{
+  // Add the input TP's contribution to the total
   // ADC and add it to the TP list.
   adc_integral += input_tp.adc_integral;
   tp_list.push_back(input_tp);
 };
 
-void ProtoDUNEBSMWindow::clear(){
+void
+ProtoDUNEBSMWindow::clear()
+{
   tp_list.clear();
 };
-      
-void ProtoDUNEBSMWindow::move(TriggerPrimitive const &input_tp, timestamp_t const &window_length){
+
+void
+ProtoDUNEBSMWindow::move(TriggerPrimitive const& input_tp, timestamp_t const& window_length)
+{
   // Find all of the TPs in the window that need to be removed
   // if the input_tp is to be added and the size of the window
   // is to be conserved.
   // Substract those TPs' contribution from the total window ADC.
   uint32_t n_tps_to_erase = 0;
-  for(auto tp : tp_list){
-    if(!(input_tp.time_start-tp.time_start < window_length)){
+  for (auto tp : tp_list) {
+    if (!(input_tp.time_start - tp.time_start < window_length)) {
       n_tps_to_erase++;
       adc_integral -= tp.adc_integral;
-    }
-    else break;
+    } else
+      break;
   }
   // Erase the TPs from the window.
-  tp_list.erase(tp_list.begin(), tp_list.begin()+n_tps_to_erase);
+  tp_list.erase(tp_list.begin(), tp_list.begin() + n_tps_to_erase);
   // Make the window start time the start time of what is now the
   // first TP.
-  if(!tp_list.empty()){
+  if (!tp_list.empty()) {
     time_start = tp_list.front().time_start;
     add(input_tp);
-  }
-  else reset(input_tp);
+  } else
+    reset(input_tp);
 };
 
-void ProtoDUNEBSMWindow::reset(TriggerPrimitive const &input_tp){
+void
+ProtoDUNEBSMWindow::reset(TriggerPrimitive const& input_tp)
+{
   // Empty the TP list.
   tp_list.clear();
-  // Set the start time of the window to be the start time of the 
+  // Set the start time of the window to be the start time of the
   // input_tp.
   time_start = input_tp.time_start;
   // Start the total ADC integral.
@@ -57,12 +67,16 @@ void ProtoDUNEBSMWindow::reset(TriggerPrimitive const &input_tp){
   tp_list.push_back(input_tp);
 };
 
-void ProtoDUNEBSMWindow::bin_window(
-    std::vector<float> &input, 
-    int num_time_bins, timestamp_t time_bin_width,
-    int num_chan_bins, channel_t n_channels_on_plane, channel_t first_channel,
-    std::unique_ptr<PDVDEffectiveChannelMap> const &effective_channel_mapper,
-    bool use_pdvd_map) {
+void
+ProtoDUNEBSMWindow::bin_window(std::vector<float>& input,
+                               int num_time_bins,
+                               timestamp_t time_bin_width,
+                               int num_chan_bins,
+                               channel_t n_channels_on_plane,
+                               channel_t first_channel,
+                               std::unique_ptr<PDVDEffectiveChannelMap> const& effective_channel_mapper,
+                               bool use_pdvd_map)
+{
 
   std::fill(input.begin(), input.end(), 0.0f);
 
@@ -75,7 +89,7 @@ void ProtoDUNEBSMWindow::bin_window(
       temp_tp_channel = effective_channel_mapper->remapCollectionPlaneChannel(temp_tp_channel);
     }
     size_t time_bin = static_cast<size_t>((tp.time_start - time_start) * inv_time_bin_width);
-    // Channel bin calculation matches model training - remainder channels are appended to 10th channel bin 
+    // Channel bin calculation matches model training - remainder channels are appended to 10th channel bin
     size_t channel_bin = static_cast<size_t>(((temp_tp_channel - first_channel) * num_chan_bins) / n_channels_on_plane);
 
     if (time_bin < num_time_bins && channel_bin < num_chan_bins) {
@@ -86,17 +100,22 @@ void ProtoDUNEBSMWindow::bin_window(
   input[num_time_bins * num_chan_bins] = adc_integral;
 };
 
-void ProtoDUNEBSMWindow::fill_entry_window(std::vector<Entry> &entry_input, std::vector<float> &input) {
+void
+ProtoDUNEBSMWindow::fill_entry_window(std::vector<Entry>& entry_input, std::vector<float>& input)
+{
   for (size_t i = 0; i < input.size(); i++) {
     entry_input[i].fvalue = input[i];
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window){
-  if(window.is_empty()) os << "Window is empty!\n";
-  else{
+std::ostream&
+operator<<(std::ostream& os, const ProtoDUNEBSMWindow& window)
+{
+  if (window.is_empty())
+    os << "Window is empty!\n";
+  else {
     os << "Window start: " << window.time_start << ", end: " << window.tp_list.back().time_start;
-    os << ". Total of: " << window.adc_integral << " ADC counts with " << window.tp_list.size() << " TPs.\n"; 
+    os << ". Total of: " << window.adc_integral << " ADC counts with " << window.tp_list.size() << " TPs.\n";
   }
   return os;
 };

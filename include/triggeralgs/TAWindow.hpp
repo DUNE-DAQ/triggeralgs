@@ -22,7 +22,7 @@ public:
   bool is_empty() const { return inputs.empty(); };
 
   /// @brief
-  /// Add the input TA's contribution to the total ADC, increase the hit count of 
+  /// Add the input TA's contribution to the total ADC, increase the hit count of
   /// all of the channels which feature and add it to the TA list keeping the TA
   /// list time ordered by time_start. Preserving time order makes moving easier.
   /// @param input_ta
@@ -33,18 +33,18 @@ public:
 
   uint16_t n_channels_hit() { return channel_states.size(); };
 
-  /// @brief 
+  /// @brief
   /// Find all of the TAs in the window that need to be removed
   /// if the input_ta is to be added and the size of the window
   /// is to be conserved.
   /// Subtract those TAs' contribution from the total window ADC and remove their
   /// contributions to the hit counts.
-  /// @param input_ta 
-  /// @param window_length 
+  /// @param input_ta
+  /// @param window_length
   void move(TriggerActivity const& input_ta, timestamp_t const& window_length);
 
   /// @brief Reset window content on the input
-  /// @param input_ta 
+  /// @param input_ta
   void reset(TriggerActivity const& input_ta);
 
   friend std::ostream& operator<<(std::ostream& os, const TAWindow& window);
